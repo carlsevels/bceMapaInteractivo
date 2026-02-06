@@ -42,9 +42,12 @@ class MapaPiso extends StatelessWidget {
             children: [
               Image.asset(image),
               ...areas.map((area) {
-                final bool isFound = currentQuery.isNotEmpty &&
-                    _removeAccents(area.nombre).contains(_removeAccents(currentQuery));
-                
+                final bool isFound =
+                    currentQuery.isNotEmpty &&
+                    _removeAccents(
+                      area.nombre,
+                    ).contains(_removeAccents(currentQuery));
+
                 return Positioned(
                   left: area.x,
                   top: area.y,
@@ -76,7 +79,8 @@ class _PulseMarker extends StatefulWidget {
   State<_PulseMarker> createState() => _PulseMarkerState();
 }
 
-class _PulseMarkerState extends State<_PulseMarker> with SingleTickerProviderStateMixin {
+class _PulseMarkerState extends State<_PulseMarker>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
 
   @override
@@ -101,7 +105,6 @@ class _PulseMarkerState extends State<_PulseMarker> with SingleTickerProviderSta
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        // El PIN (Ahora más pequeño para no estorbar)
         Stack(
           alignment: Alignment.center,
           children: [
@@ -113,7 +116,10 @@ class _PulseMarkerState extends State<_PulseMarker> with SingleTickerProviderSta
                   child: Container(
                     width: 30,
                     height: 30,
-                    decoration: BoxDecoration(color: mainColor, shape: BoxShape.circle),
+                    decoration: BoxDecoration(
+                      color: mainColor,
+                      shape: BoxShape.circle,
+                    ),
                   ),
                 ),
               ),
@@ -122,25 +128,29 @@ class _PulseMarkerState extends State<_PulseMarker> with SingleTickerProviderSta
                 color: mainColor,
                 shape: BoxShape.circle,
                 border: Border.all(color: Colors.white, width: 2),
-                boxShadow: const [BoxShadow(color: Colors.black26, blurRadius: 4)],
+                boxShadow: const [
+                  BoxShadow(color: Colors.black26, blurRadius: 4),
+                ],
               ),
               padding: const EdgeInsets.all(4),
               child: Icon(
                 Icons.location_on,
                 color: Colors.white,
-                size: widget.isHighlighted ? 22 : 16, // Reducido significativamente
+                size: widget.isHighlighted ? 22 : 16,
               ),
             ),
           ],
         ),
-        
+
         const SizedBox(height: 4),
-        
+
         Container(
-          constraints: const BoxConstraints(maxWidth: 120), // Evita que crezca demasiado
+          constraints: const BoxConstraints(maxWidth: 120),
           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
           decoration: BoxDecoration(
-            color: widget.isHighlighted ? Colors.amber : Colors.black.withOpacity(0.7),
+            color: widget.isHighlighted
+                ? Colors.amber
+                : Colors.black.withOpacity(0.7),
             borderRadius: BorderRadius.circular(8),
           ),
           child: Text(
@@ -148,7 +158,9 @@ class _PulseMarkerState extends State<_PulseMarker> with SingleTickerProviderSta
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: widget.isHighlighted ? 10 : 8, // Letra pequeña y clara
-              fontWeight: widget.isHighlighted ? FontWeight.bold : FontWeight.w500,
+              fontWeight: widget.isHighlighted
+                  ? FontWeight.bold
+                  : FontWeight.w500,
               color: widget.isHighlighted ? Colors.black : Colors.white,
               decoration: TextDecoration.none,
             ),

@@ -241,8 +241,7 @@ class HomeController extends GetxController {
   }
 
 void onAreaSelected(Area area) {
-  query.value = "";
-  searchController.clear();
+
 
   visibleArea.value = area;
   selectedArea.value = area;
