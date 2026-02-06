@@ -28,7 +28,7 @@ class HomeController extends GetxController {
         nombre: 'Módulo de información',
         x: 820,
         y: 700,
-        categoria: 'Información', // <--- Agregado
+        categoria: 'Información',
         descripcion: 'Punto principal de orientación para visitantes.',
         horario: 'Lunes a Viernes · 9:00 AM – 8:00 PM',
         servicios: ['Orientación', 'Apoyo catálogo'],

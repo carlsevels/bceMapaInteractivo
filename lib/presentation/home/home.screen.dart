@@ -45,23 +45,24 @@ class HomeScreen extends GetView<HomeController> {
                     child: MapaPiso(
                       key: ValueKey(controller.pisoActual.value),
                       image: 'assets/piso_${controller.pisoActual.value}.png',
-                      areas: controller.pisos[controller.pisoActual.value] ?? [],
+                      areas:
+                          controller.pisos[controller.pisoActual.value] ?? [],
                       currentQuery: controller.query.value,
                       // 🔹 SE PASA LA CATEGORÍA PARA EL FILTRADO
                       selectedCategory: controller.categoriaSeleccionada.value,
                       missionStep: controller.missionStep.value,
                       onAreaTap: controller.onAreaSelected,
-                      transformationController: controller.transformationController,
+                      transformationController:
+                          controller.transformationController,
                     ),
                   ),
 
                   // 🔹 BARRA DE FILTROS POR CATEGORÍA
                   _buildCategoryFilterBar(),
-                  
+
                   _buildFloatingFloorIndicator(),
                   _buildFloatingMenuButton(),
                   _buildZoomControls(),
-
                   Obx(
                     () => controller.missionStep.value > 0
                         ? _buildMissionBanner()
@@ -94,8 +95,15 @@ class HomeScreen extends GetView<HomeController> {
 
   // 🔹 NUEVO MÉTODO: Barra de filtros horizontal
   Widget _buildCategoryFilterBar() {
-    final categorias = ["Información", "Cultura", "Estudio", "Alimentos", "Tecnología", "Infantil"];
-    
+    final categorias = [
+      "Información",
+      "Cultura",
+      "Estudio",
+      "Alimentos",
+      "Tecnología",
+      "Infantil",
+    ];
+
     return Positioned(
       top: 80,
       left: 20,
@@ -103,28 +111,33 @@ class HomeScreen extends GetView<HomeController> {
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
         child: Row(
-          children: categorias.map((cat) => Obx(() {
-                bool isSelected = controller.categoriaSeleccionada.value == cat;
-                return Padding(
-                  padding: const EdgeInsets.only(right: 8),
-                  child: FilterChip(
-                    selected: isSelected,
-                    label: Text(cat),
-                    labelStyle: TextStyle(
-                      color: isSelected ? Colors.white : Colors.cyan[900],
-                      fontWeight: FontWeight.bold,
-                      fontSize: 13,
+          children: categorias
+              .map(
+                (cat) => Obx(() {
+                  bool isSelected =
+                      controller.categoriaSeleccionada.value == cat;
+                  return Padding(
+                    padding: const EdgeInsets.only(right: 8),
+                    child: FilterChip(
+                      selected: isSelected,
+                      label: Text(cat),
+                      labelStyle: TextStyle(
+                        color: isSelected ? Colors.white : Colors.cyan[900],
+                        fontWeight: FontWeight.bold,
+                        fontSize: 13,
+                      ),
+                      selectedColor: Colors.cyan[700],
+                      backgroundColor: Colors.white.withOpacity(0.95),
+                      checkmarkColor: Colors.white,
+                      elevation: 4,
+                      onSelected: (bool value) {
+                        controller.setCategoria(cat);
+                      },
                     ),
-                    selectedColor: Colors.cyan[700],
-                    backgroundColor: Colors.white.withOpacity(0.95),
-                    checkmarkColor: Colors.white,
-                    elevation: 4,
-                    onSelected: (bool value) {
-                      controller.setCategoria(cat);
-                    },
-                  ),
-                );
-              })).toList(),
+                  );
+                }),
+              )
+              .toList(),
         ),
       ),
     );
@@ -322,10 +335,12 @@ class HomeScreen extends GetView<HomeController> {
               ),
             ),
             const SizedBox(height: 40),
-            Obx(() => _highlightArea(
-                  active: controller.missionStep.value == 2,
-                  child: _buildHugeSearch(),
-                )),
+            Obx(
+              () => _highlightArea(
+                active: controller.missionStep.value == 2,
+                child: _buildHugeSearch(),
+              ),
+            ),
             const SizedBox(height: 50),
             const Text(
               'SELECCIONA NIVEL',
@@ -337,10 +352,12 @@ class HomeScreen extends GetView<HomeController> {
               ),
             ),
             const SizedBox(height: 20),
-            Obx(() => _highlightArea(
-                  active: controller.missionStep.value == 1,
-                  child: _buildFloorList(),
-                )),
+            Obx(
+              () => _highlightArea(
+                active: controller.missionStep.value == 1,
+                child: _buildFloorList(),
+              ),
+            ),
             const SizedBox(height: 30),
             _buildHelpButton(),
           ],
@@ -357,6 +374,7 @@ class HomeScreen extends GetView<HomeController> {
           onChanged: (value) {
             controller.query.value = value;
             controller.buscarSugerencias(value);
+            controller.resetZoom();
           },
           style: const TextStyle(color: Colors.white, fontSize: 18),
           decoration: InputDecoration(
@@ -371,24 +389,27 @@ class HomeScreen extends GetView<HomeController> {
             ),
           ),
         ),
-        Obx(() => controller.sugerencias.isEmpty
-            ? const SizedBox.shrink()
-            : Container(
-                margin: const EdgeInsets.only(top: 10),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(15),
+        Obx(
+          () => controller.sugerencias.isEmpty
+              ? const SizedBox.shrink()
+              : Container(
+                  margin: const EdgeInsets.only(top: 10),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                  child: Column(
+                    children: controller.sugerencias.map((area) {
+                      return ListTile(
+                        leading: const Icon(Icons.place),
+                        title: Text(area.nombre),
+                        onTap: () =>
+                            controller.seleccionarDesdeSugerencia(area),
+                      );
+                    }).toList(),
+                  ),
                 ),
-                child: Column(
-                  children: controller.sugerencias.map((area) {
-                    return ListTile(
-                      leading: const Icon(Icons.place),
-                      title: Text(area.nombre),
-                      onTap: () => controller.seleccionarDesdeSugerencia(area),
-                    );
-                  }).toList(),
-                ),
-              )),
+        ),
       ],
     );
   }
@@ -414,14 +435,18 @@ class HomeScreen extends GetView<HomeController> {
               ),
               child: Row(
                 children: [
-                  Icon(i == 1 ? Icons.filter_1 : Icons.filter_2,
-                      color: sel ? Colors.orange[600] : Colors.white),
+                  Icon(
+                    i == 1 ? Icons.filter_1 : Icons.filter_2,
+                    color: sel ? Colors.orange[600] : Colors.white,
+                  ),
                   const SizedBox(width: 15),
-                  Text('PISO $i',
-                      style: TextStyle(
-                        color: sel ? Colors.orange[600] : Colors.white,
-                        fontWeight: FontWeight.bold,
-                      )),
+                  Text(
+                    'PISO $i',
+                    style: TextStyle(
+                      color: sel ? Colors.orange[600] : Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -445,9 +470,12 @@ class HomeScreen extends GetView<HomeController> {
 
   Widget _buildMissionBanner() {
     String msg = "";
-    if (controller.missionStep.value == 1) msg = "Dime en qué piso estás.";
-    else if (controller.missionStep.value == 2) msg = "Escribe el área en el buscador.";
-    else if (controller.missionStep.value == 3) msg = "Toca el marcador para ver los detalles.";
+    if (controller.missionStep.value == 1)
+      msg = "Dime en qué piso estás.";
+    else if (controller.missionStep.value == 2)
+      msg = "Escribe el área en el buscador.";
+    else if (controller.missionStep.value == 3)
+      msg = "Toca el marcador para ver los detalles.";
 
     return Positioned(
       bottom: 110,
@@ -459,7 +487,11 @@ class HomeScreen extends GetView<HomeController> {
         color: Colors.amber,
         child: Padding(
           padding: const EdgeInsets.all(15),
-          child: Text(msg, textAlign: TextAlign.center, style: const TextStyle(fontWeight: FontWeight.bold)),
+          child: Text(
+            msg,
+            textAlign: TextAlign.center,
+            style: const TextStyle(fontWeight: FontWeight.bold),
+          ),
         ),
       ),
     );
@@ -477,7 +509,12 @@ class HomeScreen extends GetView<HomeController> {
           borderRadius: BorderRadius.circular(15),
           border: Border.all(color: Colors.white54, width: 2),
         ),
-        child: const Center(child: Text('AYUDA / TUTORIAL', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold))),
+        child: const Center(
+          child: Text(
+            'AYUDA / TUTORIAL',
+            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          ),
+        ),
       ),
     );
   }
