@@ -3,16 +3,6 @@ import 'package:mapa_interactivo/infrastructure/models/area.dart';
 import 'package:vector_math/vector_math_64.dart' as vmath;
 import 'dart:math';
 
-/// Auxiliar para normalizar texto en búsquedas
-String _removeAccents(String text) {
-  var withDia = 'áéíóúÁÉÍÓÚäëïöüÄËÏÖÜ';
-  var withoutDia = 'aeiouAEIOUaeiouAEIOU';
-  for (int i = 0; i < withDia.length; i++) {
-    text = text.replaceAll(withDia[i], withoutDia[i]);
-  }
-  return text.toLowerCase();
-}
-
 class MapaPiso extends StatelessWidget {
   final String image;
   final List<Area> areas;
@@ -33,14 +23,31 @@ class MapaPiso extends StatelessWidget {
     required this.transformationController,
   }) : super(key: key);
 
+  String _removeAccents(String text) {
+    var withDia = 'áéíóúÁÉÍÓÚäëïöüÄËÏÖÜ';
+    var withoutDia = 'aeiouAEIOUaeiouAEIOU';
+    for (int i = 0; i < withDia.length; i++) {
+      text = text.replaceAll(withDia[i], withoutDia[i]);
+    }
+    return text.toLowerCase();
+  }
+
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(builder: (context, constraints) {
       final size = Size(constraints.maxWidth, constraints.maxHeight);
 
+      // Filtrado de áreas para mostrar en el mapa
+      final visibleAreas = areas.where((area) {
+        if (area.esUbicacionActual) return true;
+        if (selectedCategory != null && selectedCategory!.isNotEmpty) {
+          return area.categoria == selectedCategory;
+        }
+        return true;
+      }).toList();
+
       return Stack(
         children: [
-          // 1. CAPA DEL MAPA (InteractiveViewer)
           InteractiveViewer(
             transformationController: transformationController,
             constrained: false,
@@ -51,10 +58,8 @@ class MapaPiso extends StatelessWidget {
               clipBehavior: Clip.none,
               children: [
                 Image.asset(image, fit: BoxFit.none),
-
-                // Renderizado de todos los puntos
-                ...areas.map((area) {
-                  final bool isFound = currentQuery.isNotEmpty &&
+                ...visibleAreas.map((area) {
+                  final bool isHighlighted = currentQuery.isNotEmpty &&
                       _removeAccents(area.nombre).contains(_removeAccents(currentQuery));
 
                   return Positioned(
@@ -64,7 +69,7 @@ class MapaPiso extends StatelessWidget {
                       onTap: () => onAreaTap(area),
                       child: _PulseMarker(
                         nombre: area.nombre,
-                        isHighlighted: isFound,
+                        isHighlighted: isHighlighted,
                         isUserLocation: area.esUbicacionActual,
                       ),
                     ),
@@ -74,40 +79,31 @@ class MapaPiso extends StatelessWidget {
             ),
           ),
 
-          // 2. CAPA DE LA FLECHA GUÍA (Solo para esUbicacionActual)
+          // 🔹 FLECHA DINÁMICA HACIA "UBICACIÓN ACTUAL"
           AnimatedBuilder(
             animation: transformationController,
             builder: (context, child) {
-              // 🔹 Lógica Filtrada: Buscar solo el punto de ubicación actual
-              final List<Area> userPoints = areas.where((a) => a.esUbicacionActual == true).toList();
-              
-              if (userPoints.isEmpty) return const SizedBox.shrink();
+              final userLocation = areas.firstWhere(
+                (a) => a.esUbicacionActual,
+                orElse: () => Area(nombre: '', descripcion: '', x: -1000, y: -1000, horario: '', servicios: [], reglas: [], galeria: [], categoria: ''),
+              );
 
-              final targetArea = userPoints.first;
+              if (userLocation.x == -1000) return const SizedBox.shrink();
 
-              // Convertir coordenadas del mapa a píxeles de pantalla
-              final vmath.Vector3 targetPosInScreen = transformationController.value
-                  .transform3(vmath.Vector3(targetArea.x, targetArea.y, 0));
-              
+              final vmath.Vector3 posInScreen = transformationController.value
+                  .transform3(vmath.Vector3(userLocation.x, userLocation.y, 0));
+
               const double margin = 50.0;
+              bool isOutside = posInScreen.x < margin ||
+                  posInScreen.x > size.width - margin ||
+                  posInScreen.y < margin ||
+                  posInScreen.y > size.height - margin;
 
-              // Determinar si el punto de ubicación está fuera de la vista del usuario
-              bool isOutside = targetPosInScreen.x < margin || 
-                               targetPosInScreen.x > size.width - margin || 
-                               targetPosInScreen.y < margin || 
-                               targetPosInScreen.y > size.height - margin;
-
-              // Si es visible en pantalla, no mostramos la flecha
               if (!isOutside) return const SizedBox.shrink();
 
-              // Posicionar la flecha en los bordes
-              final double arrowX = targetPosInScreen.x.clamp(margin, size.width - margin);
-              final double arrowY = targetPosInScreen.y.clamp(margin, size.height - margin);
-
-              final double angle = atan2(
-                targetPosInScreen.y - arrowY, 
-                targetPosInScreen.x - arrowX
-              );
+              final double arrowX = posInScreen.x.clamp(margin, size.width - margin);
+              final double arrowY = posInScreen.y.clamp(margin, size.height - margin);
+              final double angle = atan2(posInScreen.y - arrowY, posInScreen.x - arrowX);
 
               return Positioned(
                 left: arrowX - 25,
@@ -117,26 +113,18 @@ class MapaPiso extends StatelessWidget {
                   children: [
                     Transform.rotate(
                       angle: angle + (pi / 2),
-                      child: const Icon(
-                        Icons.navigation,
-                        size: 40,
-                        color: Colors.redAccent,
-                      ),
+                      child: const Icon(Icons.navigation, size: 40, color: Colors.redAccent),
                     ),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                       decoration: BoxDecoration(
                         color: Colors.redAccent,
-                        borderRadius: BorderRadius.circular(6),
-                        boxShadow: const [BoxShadow(color: Colors.black45, blurRadius: 4)],
+                        borderRadius: BorderRadius.circular(4),
+                        boxShadow: const [BoxShadow(color: Colors.black26, blurRadius: 4)],
                       ),
                       child: const Text(
                         "ESTÁS AQUÍ",
-                        style: TextStyle(
-                          color: Colors.white, 
-                          fontSize: 10, 
-                          fontWeight: FontWeight.bold
-                        ),
+                        style: TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.bold),
                       ),
                     ),
                   ],

@@ -3,24 +3,20 @@ import 'package:get/get.dart';
 import 'package:mapa_interactivo/infrastructure/models/area.dart';
 
 class HomeController extends GetxController {
-  //TODO: Implement HomeController
   final RxInt missionStep = 0.obs;
   final RxBool isMenuOpen = true.obs;
-
   final TextEditingController searchController = TextEditingController();
-
   final Rx<Area?> selectedArea = Rx<Area?>(null);
-
-  // 🔥 ESTE ES EL FIX CLAVE
   final Rx<Area?> visibleArea = Rx<Area?>(null);
-
   final RxBool isPanelOpen = false.obs;
-
   final RxInt pisoActual = 1.obs;
   final RxString query = ''.obs;
   final RxList<Area> sugerencias = <Area>[].obs;
+  final RxString categoriaSeleccionada = ''.obs;
 
-  final count = 0.obs;
+  // Controlador para el InteractiveViewer
+  final TransformationController transformationController =
+      TransformationController();
 
   final Map<int, List<Area>> pisos = {
     1: [
@@ -119,7 +115,7 @@ class HomeController extends GetxController {
         x: 700,
         y: 160,
         categoria: 'Ubicación',
-        descripcion: 'Te encuentras en el punto de consulta del primer piso.',
+        descripcion: 'Te encuentras en el punto de consulta del segundo piso.',
         horario: 'Disponible 24/7',
         esUbicacionActual: true,
         servicios: ['Mapa interactivo', 'Búsqueda de libros'],
@@ -150,7 +146,6 @@ class HomeController extends GetxController {
         sePuedeRentar: true,
         infoRenta: 'Solicitar vía correo con 2 semanas de anticipación.',
       ),
-
       Area(
         nombre: 'Comicteca',
         x: 990,
@@ -243,25 +238,46 @@ class HomeController extends GetxController {
     ],
   };
 
-  void closePanel() {
-    isPanelOpen.value = false;
-
-    Future.delayed(const Duration(milliseconds: 800), () {
-      visibleArea.value = null;
-      selectedArea.value = null;
+  @override
+  void onInit() {
+    super.onInit();
+    ever(pisoActual, (_) {
+      if (missionStep.value == 1) missionStep.value = 2;
     });
+    ever(query, (String val) {
+      if (missionStep.value == 2 && val.length > 1) missionStep.value = 3;
+    });
+  }
+
+  void iniciarTutorial() {
+    missionStep.value = 1;
+    isMenuOpen.value = true;
+    resetZoom();
+  }
+
+  void cancelarTutorial() {
+    missionStep.value = 0;
+    searchController.clear();
+    query.value = '';
+    Get.snackbar(
+      "Tutorial cancelado",
+      "Puedes volver a iniciarlo cuando gustes.",
+      snackPosition: SnackPosition.BOTTOM,
+      backgroundColor: Colors.black87,
+      colorText: Colors.white,
+    );
   }
 
   void onAreaSelected(Area area) {
     visibleArea.value = area;
     selectedArea.value = area;
     isPanelOpen.value = true;
-
+    
     if (missionStep.value == 3) {
       missionStep.value = 0;
       Get.snackbar(
         "¡MISIÓN COMPLETADA!",
-        "Has encontrado el área correctamente.",
+        "Has aprendido a navegar por el mapa.",
         snackPosition: SnackPosition.TOP,
         backgroundColor: Colors.amber,
         colorText: Colors.black,
@@ -270,111 +286,93 @@ class HomeController extends GetxController {
     }
   }
 
-  @override
-  void onInit() {
-    super.onInit();
+  void closePanel() {
+    isPanelOpen.value = false;
+    Future.delayed(const Duration(milliseconds: 800), () {
+      visibleArea.value = null;
+      selectedArea.value = null;
+    });
   }
 
-  @override
-  void onReady() {
-    super.onReady();
-  }
-
-  @override
-  void onClose() {
-    super.onClose();
-  }
-
-  void increment() => count.value++;
-
-  void seleccionarDesdeSugerencia(Area area) {
-    // Cambiar piso si es necesario
-    if (pisoActual.value != area.piso) {
-      pisoActual.value = area.piso!;
-    }
-
-    // Limpiar buscador
-    query.value = area.nombre;
-    searchController.text = area.nombre;
-    sugerencias.clear();
-
-    // Seleccionar área
-    onAreaSelected(area);
-  }
-
-  /// 🔹 BUSCAR
-  void buscarSugerencias(String query) {
-    if (query.trim().isEmpty) {
+  void buscarSugerencias(String val) {
+    query.value = val;
+    if (val.trim().isEmpty) {
       sugerencias.clear();
       return;
     }
-
-    final normalizedQuery = normalize(query);
-
+    final normalizedQuery = normalize(val);
     final List<Area> resultados = [];
-
     pisos.forEach((piso, areas) {
       for (final area in areas) {
-        final nombreNormalizado = normalize(area.nombre);
-        final descripcionNormalizada = normalize(area.descripcion);
-
-        if (nombreNormalizado.contains(normalizedQuery) ||
-            descripcionNormalizada.contains(normalizedQuery)) {
+        if (normalize(area.nombre).contains(normalizedQuery)) {
           resultados.add(area.copyWith(piso: piso));
         }
       }
     });
-
     sugerencias.assignAll(resultados);
+  }
+
+  // 🔹 MÉTODO ACTUALIZADO CON AUTO-ZOOM
+  void seleccionarDesdeSugerencia(Area area) async {
+    // 1. Verificar si hay que cambiar de piso
+    if (pisoActual.value != area.piso) {
+      pisoActual.value = area.piso!;
+      await Future.delayed(const Duration(milliseconds: 50));
+    }
+
+    query.value = area.nombre;
+    searchController.text = area.nombre;
+    sugerencias.clear();
+
+    // 2. Ejecutar el Zoom al punto exacto
+    _aplicarZoomAutomatico(area);
+
+    // 3. Abrir el panel de detalles
+    //onAreaSelected(area);
+  }
+
+  void _aplicarZoomAutomatico(Area area) {
+    const double zoomScale = 2.5; // Nivel de zoom
+    final Size screenSize = Get.size;
+
+    // Calculamos el centro de la pantalla restando el ancho del menú si está abierto
+    double centerX = screenSize.width / 2;
+    if (isMenuOpen.value) {
+      centerX -= 175; // Ajuste para centrar en el espacio sobrante del menú
+    }
+
+    final double x = centerX - (area.x * zoomScale);
+    final double y = (screenSize.height / 2) - (area.y * zoomScale);
+
+    // Creamos la nueva matriz de transformación
+    final Matrix4 newMatrix = Matrix4.identity()
+      ..translate(x, y)
+      ..scale(zoomScale);
+
+    // Aplicamos al controlador
+    transformationController.value = newMatrix;
   }
 
   String normalize(String text) {
     const withAccents = 'áéíóúüñÁÉÍÓÚÜÑ';
     const withoutAccents = 'aeiouunAEIOUUN';
-
     for (int i = 0; i < withAccents.length; i++) {
       text = text.replaceAll(withAccents[i], withoutAccents[i]);
     }
-
     return text.toLowerCase();
   }
 
-  // En tu HomeController
-  final TransformationController transformationController =
-      TransformationController();
-
-  void zoomIn() {
-    final Matrix4 current = transformationController.value;
-    // Multiplicamos la escala actual por 1.2
-    transformationController.value = current.clone()..scale(1.2);
-  }
-
-  void zoomOut() {
-    final Matrix4 current = transformationController.value;
-    // Multiplicamos la escala actual por 0.8
-    transformationController.value = current.clone()..scale(0.8);
-  }
-
-  void resetZoom() {
-    // Volvemos a la matriz identidad (escala 1:1, posición 0,0)
-    transformationController.value = Matrix4.identity();
-  }
-
-  var categoriaSeleccionada = ''.obs; // Observable para el filtro
-
-  void filtrarPorCategoria(String categoria) {
-    if (categoriaSeleccionada.value == categoria) {
-      categoriaSeleccionada.value = ''; // Si toca la misma, limpiamos filtro
-    } else {
-      categoriaSeleccionada.value = categoria;
-    }
-  }
+  void zoomIn() =>
+      transformationController.value = transformationController.value.clone()
+        ..scale(1.2);
+  void zoomOut() =>
+      transformationController.value = transformationController.value.clone()
+        ..scale(0.8);
+  void resetZoom() => transformationController.value = Matrix4.identity();
 
   void setCategoria(String cat) {
-    if (categoriaSeleccionada.value == cat) {
-      categoriaSeleccionada.value = ''; // Limpiar filtro si toca el mismo
-    } else {
-      categoriaSeleccionada.value = cat;
-    }
+    categoriaSeleccionada.value = (categoriaSeleccionada.value == cat)
+        ? ''
+        : cat;
   }
 }
