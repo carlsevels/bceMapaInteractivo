@@ -10,7 +10,8 @@ class Area {
   final bool? sePuedeRentar;
   final String? infoRenta;
   final int? piso;
-  final String categoria; // 🔹 AGREGADO: Para los filtros (ej: 'Baños', 'Libros')
+  final String categoria;
+  final bool esUbicacionActual; // 🔹 NUEVO: Para identificar el punto "Usted está aquí"
 
   Area({
     required this.nombre,
@@ -21,16 +22,18 @@ class Area {
     required this.servicios,
     required this.reglas,
     required this.galeria,
-    required this.categoria, // 🔹 REQUERIDO AHORA
+    required this.categoria,
+    this.esUbicacionActual = false, // 🔹 Valor por defecto: no es ubicación
     this.sePuedeRentar,
     this.infoRenta,
     this.piso,
   });
 
-  /// 🔹 ACTUALIZADO CON CATEGORIA
+  /// 🔹 ACTUALIZADO CON CATEGORIA Y UBICACIÓN
   Area copyWith({
     int? piso,
     String? categoria,
+    bool? esUbicacionActual,
   }) {
     return Area(
       nombre: nombre,
@@ -45,6 +48,7 @@ class Area {
       infoRenta: infoRenta,
       categoria: categoria ?? this.categoria,
       piso: piso ?? this.piso,
+      esUbicacionActual: esUbicacionActual ?? this.esUbicacionActual,
     );
   }
 }

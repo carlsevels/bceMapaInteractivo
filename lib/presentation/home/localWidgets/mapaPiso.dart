@@ -32,9 +32,11 @@ class MapaPiso extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // FILTRADO DE ÁREAS
     final visibleAreas = areas.where((area) {
-      if (currentQuery.isNotEmpty) return true; // Prioridad a búsqueda manual
+      // 🔹 IMPORTANTE: Siempre mostrar la ubicación actual aunque haya filtros
+      if (area.esUbicacionActual) return true; 
+      
+      if (currentQuery.isNotEmpty) return true;
       if (selectedCategory != null && selectedCategory!.isNotEmpty) {
         return area.categoria == selectedCategory;
       }
@@ -61,7 +63,12 @@ class MapaPiso extends StatelessWidget {
               child: GestureDetector(
                 behavior: HitTestBehavior.opaque,
                 onTap: () => onAreaTap(area),
-                child: _PulseMarker(nombre: area.nombre, isHighlighted: isFound),
+                // 🔹 PASAMOS EL NUEVO CAMPO AL MARCADOR
+                child: _PulseMarker(
+                  nombre: area.nombre, 
+                  isHighlighted: isFound,
+                  isUserLocation: area.esUbicacionActual, // <--- Nueva propiedad
+                ),
               ),
             );
           }).toList(),
@@ -71,60 +78,96 @@ class MapaPiso extends StatelessWidget {
   }
 }
 
-// Widget de marcador con pulso animado
 class _PulseMarker extends StatefulWidget {
   final String nombre;
   final bool isHighlighted;
-  const _PulseMarker({required this.nombre, required this.isHighlighted});
+  final bool isUserLocation; // 🔹 Detectar si es el "Usted está aquí"
+
+  const _PulseMarker({
+    required this.nombre, 
+    required this.isHighlighted,
+    this.isUserLocation = false,
+  });
+
   @override
   State<_PulseMarker> createState() => _PulseMarkerState();
 }
 
 class _PulseMarkerState extends State<_PulseMarker> with SingleTickerProviderStateMixin {
   late AnimationController _controller;
+
   @override
   void initState() {
     super.initState();
     _controller = AnimationController(vsync: this, duration: const Duration(seconds: 2))..repeat();
   }
+
   @override
   void dispose() {
     _controller.dispose();
     super.dispose();
   }
+
   @override
   Widget build(BuildContext context) {
-    final Color mainColor = widget.isHighlighted ? Colors.amber : Colors.indigo;
+    // 🔹 LÓGICA DE COLORES: Si es ubicación es Rojo, si es búsqueda es Ámbar, sino Índigo.
+    final Color mainColor = widget.isUserLocation 
+        ? Colors.redAccent 
+        : (widget.isHighlighted ? Colors.amber : Colors.indigo);
+
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
         Stack(
           alignment: Alignment.center,
           children: [
-            if (widget.isHighlighted)
+            // El pulso animado se activa si es encontrado O si es la ubicación actual
+            if (widget.isHighlighted || widget.isUserLocation)
               FadeTransition(
                 opacity: Tween(begin: 0.5, end: 0.0).animate(_controller),
                 child: ScaleTransition(
                   scale: Tween(begin: 1.0, end: 2.5).animate(_controller),
-                  child: Container(width: 30, height: 30, decoration: BoxDecoration(color: mainColor, shape: BoxShape.circle)),
+                  child: Container(
+                    width: 30, 
+                    height: 30, 
+                    decoration: BoxDecoration(color: mainColor, shape: BoxShape.circle),
+                  ),
                 ),
               ),
             Container(
               decoration: BoxDecoration(
-                color: mainColor, shape: BoxShape.circle,
+                color: mainColor, 
+                shape: BoxShape.circle,
                 border: Border.all(color: Colors.white, width: 2),
                 boxShadow: const [BoxShadow(color: Colors.black26, blurRadius: 4)],
               ),
               padding: const EdgeInsets.all(4),
-              child: Icon(Icons.location_on, color: Colors.white, size: widget.isHighlighted ? 22 : 16),
+              // 🔹 ICONO DIFERENTE: Personita para ubicación, pin para lo demás
+              child: Icon(
+                widget.isUserLocation ? Icons.person_pin : Icons.location_on, 
+                color: Colors.white, 
+                size: (widget.isHighlighted || widget.isUserLocation) ? 22 : 16,
+              ),
             ),
           ],
         ),
         const SizedBox(height: 4),
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
-          decoration: BoxDecoration(color: widget.isHighlighted ? Colors.amber : Colors.black87, borderRadius: BorderRadius.circular(8)),
-          child: Text(widget.nombre.toUpperCase(), style: TextStyle(fontSize: 8, color: widget.isHighlighted ? Colors.black : Colors.white, fontWeight: FontWeight.bold)),
+          decoration: BoxDecoration(
+            color: widget.isUserLocation 
+                ? Colors.redAccent 
+                : (widget.isHighlighted ? Colors.amber : Colors.black87), 
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Text(
+            widget.nombre.toUpperCase(), 
+            style: TextStyle(
+              fontSize: 8, 
+              color: (widget.isHighlighted || widget.isUserLocation) ? Colors.white : Colors.white, 
+              fontWeight: FontWeight.bold,
+            ),
+          ),
         ),
       ],
     );

@@ -115,6 +115,29 @@ class HomeController extends GetxController {
     ],
     2: [
       Area(
+        nombre: 'Punto de Consulta Principal',
+        x: 700,
+        y: 160,
+        categoria: 'Ubicación',
+        descripcion: 'Te encuentras en el punto de consulta del primer piso.',
+        horario: 'Disponible 24/7',
+        esUbicacionActual: true,
+        servicios: ['Mapa interactivo', 'Búsqueda de libros'],
+        reglas: ['Uso preferente para visitantes'],
+        galeria: ['assets/multimedia/vr_1.png'],
+      ),
+      Area(
+        nombre: 'Sala juvenil',
+        x: 550,
+        y: 120,
+        categoria: 'Estudio',
+        descripcion: 'Espacio tranquilo...',
+        horario: '9:00 AM – 8:00 PM',
+        servicios: ['Mesas'],
+        reglas: ['Silencio'],
+        galeria: ['assets/multimedia/vr_1.png'],
+      ),
+      Area(
         nombre: 'Auditorio',
         x: 150,
         y: 140,
@@ -127,17 +150,7 @@ class HomeController extends GetxController {
         sePuedeRentar: true,
         infoRenta: 'Solicitar vía correo con 2 semanas de anticipación.',
       ),
-      Area(
-        nombre: 'Sala juvenil',
-        x: 720,
-        y: 160,
-        categoria: 'Estudio',
-        descripcion: 'Espacio tranquilo...',
-        horario: '9:00 AM – 8:00 PM',
-        servicios: ['Mesas'],
-        reglas: ['Silencio'],
-        galeria: ['assets/multimedia/vr_1.png'],
-      ),
+
       Area(
         nombre: 'Comicteca',
         x: 990,
@@ -229,6 +242,7 @@ class HomeController extends GetxController {
       ),
     ],
   };
+
   void closePanel() {
     isPanelOpen.value = false;
 
