@@ -1,0 +1,2 @@
+export 'package:mapa_interactivo/infrastructure/navigation/bindings/controllers/detalles_area.controller.binding.dart'; 
+export 'package:mapa_interactivo/infrastructure/navigation/bindings/controllers/home.controller.binding.dart'; 
