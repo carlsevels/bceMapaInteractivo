@@ -10,6 +10,7 @@ class Area {
   final bool? sePuedeRentar;
   final String? infoRenta;
   final int? piso;
+  final String categoria; // 🔹 AGREGADO: Para los filtros (ej: 'Baños', 'Libros')
 
   Area({
     required this.nombre,
@@ -20,13 +21,17 @@ class Area {
     required this.servicios,
     required this.reglas,
     required this.galeria,
+    required this.categoria, // 🔹 REQUERIDO AHORA
     this.sePuedeRentar,
     this.infoRenta,
     this.piso,
   });
 
-  /// 🔹 SOLO SE AGREGA ESTO
-  Area copyWith({int? piso}) {
+  /// 🔹 ACTUALIZADO CON CATEGORIA
+  Area copyWith({
+    int? piso,
+    String? categoria,
+  }) {
     return Area(
       nombre: nombre,
       descripcion: descripcion,
@@ -38,6 +43,7 @@ class Area {
       galeria: galeria,
       sePuedeRentar: sePuedeRentar,
       infoRenta: infoRenta,
+      categoria: categoria ?? this.categoria,
       piso: piso ?? this.piso,
     );
   }

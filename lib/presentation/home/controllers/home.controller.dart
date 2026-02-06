@@ -22,13 +22,13 @@ class HomeController extends GetxController {
 
   final count = 0.obs;
 
-  // Datos mantenidos íntegramente
   final Map<int, List<Area>> pisos = {
     1: [
       Area(
         nombre: 'Módulo de información',
         x: 820,
         y: 700,
+        categoria: 'Información', // <--- Agregado
         descripcion: 'Punto principal de orientación para visitantes.',
         horario: 'Lunes a Viernes · 9:00 AM – 8:00 PM',
         servicios: ['Orientación', 'Apoyo catálogo'],
@@ -39,6 +39,7 @@ class HomeController extends GetxController {
         nombre: 'Área de inclusión',
         x: 370,
         y: 730,
+        categoria: 'Inclusión',
         descripcion: 'Acceso equitativo a la información.',
         horario: 'Lunes a Sábado · 9:00 AM – 7:00 PM',
         servicios: ['Braille', 'Audiolibros'],
@@ -49,6 +50,7 @@ class HomeController extends GetxController {
         nombre: 'Sala multipropósito',
         x: 230,
         y: 780,
+        categoria: 'Cultura',
         descripcion: 'Actividades culturales y talleres.',
         horario: 'Según programación',
         servicios: ['Talleres', 'Conferencias'],
@@ -59,6 +61,7 @@ class HomeController extends GetxController {
         nombre: 'Sala de juntas',
         x: 370,
         y: 850,
+        categoria: 'Estudio',
         descripcion: 'Reuniones de trabajo y académicas.',
         horario: 'Lunes a Viernes · 10:00 AM – 6:00 PM',
         servicios: ['Reservación'],
@@ -69,6 +72,7 @@ class HomeController extends GetxController {
         nombre: 'Cafetería',
         x: 620,
         y: 920,
+        categoria: 'Alimentos',
         descripcion: 'Consumo de alimentos y bebidas.',
         horario: '8:30 AM – 7:30 PM',
         servicios: ['Venta alimentos'],
@@ -79,6 +83,7 @@ class HomeController extends GetxController {
         nombre: 'Legado N.L.',
         x: 970,
         y: 170,
+        categoria: 'Cultura',
         descripcion: 'Patrimonio histórico de Nuevo León.',
         horario: 'Martes a Domingo · 10:00 AM – 6:00 PM',
         servicios: ['Exposiciones'],
@@ -89,6 +94,7 @@ class HomeController extends GetxController {
         nombre: 'Acervo',
         x: 200,
         y: 200,
+        categoria: 'Cultura',
         descripcion: 'Patrimonio histórico de Nuevo León.',
         horario: 'Martes a Domingo · 10:00 AM – 6:00 PM',
         servicios: ['Exposiciones'],
@@ -99,6 +105,7 @@ class HomeController extends GetxController {
         nombre: 'Cubiculos',
         x: 510,
         y: 70,
+        categoria: 'Estudio',
         descripcion: 'Patrimonio histórico de Nuevo León.',
         horario: 'Martes a Domingo · 10:00 AM – 6:00 PM',
         servicios: ['Exposiciones'],
@@ -111,24 +118,20 @@ class HomeController extends GetxController {
         nombre: 'Auditorio',
         x: 150,
         y: 140,
-        descripcion:
-            'Espacio amplio destinado a conferencias, presentaciones culturales y eventos académicos.',
+        categoria: 'Cultura',
+        descripcion: 'Espacio amplio destinado a conferencias y eventos.',
         horario: '9:00 AM – 8:00 PM',
-        servicios: ['Escenario', 'Sistema de sonido', 'Proyector', 'Butacas'],
-        reglas: [
-          'Mantener orden durante el evento',
-          'No introducir alimentos',
-          'Respetar horarios asignados',
-        ],
-        galeria: ['assets/multimedia/vr_1.png', 'assets/multimedia/vr_2.png'],
+        servicios: ['Escenario', 'Sonido'],
+        reglas: ['No alimentos'],
+        galeria: ['assets/multimedia/vr_1.png'],
         sePuedeRentar: true,
-        infoRenta:
-            'Disponible con al menos 2 semanas de anticipación. Solicitar vía correo electrónico en recepcion@biblioteca.gob.mx',
+        infoRenta: 'Solicitar vía correo con 2 semanas de anticipación.',
       ),
       Area(
         nombre: 'Sala juvenil',
         x: 720,
         y: 160,
+        categoria: 'Estudio',
         descripcion: 'Espacio tranquilo...',
         horario: '9:00 AM – 8:00 PM',
         servicios: ['Mesas'],
@@ -139,98 +142,93 @@ class HomeController extends GetxController {
         nombre: 'Comicteca',
         x: 990,
         y: 170,
-        descripcion: 'Espacio tranquilo...',
+        categoria: 'Cultura',
+        descripcion: 'Colección de cómics y novelas gráficas.',
         horario: '9:00 AM – 8:00 PM',
-        servicios: ['Mesas'],
-        reglas: ['Silencio'],
+        servicios: ['Lectura'],
+        reglas: ['Cuidar materiales'],
         galeria: ['assets/multimedia/vr_1.png'],
       ),
       Area(
         nombre: 'Primera infancia',
         x: 350,
         y: 750,
-        descripcion: 'Espacio tranquilo...',
+        categoria: 'Infantil',
+        descripcion: 'Área para los más pequeños.',
         horario: '9:00 AM – 8:00 PM',
-        servicios: ['Mesas'],
-        reglas: ['Silencio'],
+        servicios: ['Juegos didácticos'],
+        reglas: ['Supervisión adultos'],
         galeria: ['assets/multimedia/vr_1.png'],
       ),
       Area(
         nombre: 'Cine infantil/Coliseo',
         x: 400,
         y: 850,
-        descripcion: 'Espacio tranquilo...',
+        categoria: 'Infantil',
+        descripcion: 'Proyecciones y cuentacuentos.',
         horario: '9:00 AM – 8:00 PM',
-        servicios: ['Mesas'],
-        reglas: ['Silencio'],
+        servicios: ['Cine'],
+        reglas: ['Orden'],
         galeria: ['assets/multimedia/vr_1.png'],
       ),
       Area(
         nombre: 'Ludoteca',
         x: 580,
         y: 960,
-        descripcion: 'Espacio tranquilo...',
+        categoria: 'Infantil',
+        descripcion: 'Espacio de juegos.',
         horario: '9:00 AM – 8:00 PM',
-        servicios: ['Mesas'],
-        reglas: ['Silencio'],
+        servicios: ['Juguetes'],
+        reglas: ['Compartir'],
         galeria: ['assets/multimedia/vr_1.png'],
       ),
       Area(
         nombre: 'Zona multimedia',
         x: 800,
         y: 650,
-        descripcion: 'Espacio tranquilo...',
+        categoria: 'Tecnología',
+        descripcion: 'Acceso a computadoras e internet.',
         horario: '9:00 AM – 8:00 PM',
-        servicios: ['Mesas'],
-        reglas: ['Silencio'],
+        servicios: ['Internet'],
+        reglas: ['Tiempo limitado'],
         galeria: ['assets/multimedia/vr_1.png'],
       ),
       Area(
         nombre: 'Realidad virtual',
         x: 800,
         y: 930,
-        descripcion: 'Espacio tranquilo...',
+        categoria: 'Tecnología',
+        descripcion: 'Experiencias inmersivas.',
         horario: '9:00 AM – 8:00 PM',
-        servicios: ['Mesas'],
-        reglas: ['Silencio'],
+        servicios: ['Gafas VR'],
+        reglas: ['Uso responsable'],
         galeria: ['assets/multimedia/vr_1.png'],
       ),
       Area(
         nombre: 'Impresión 3D',
         x: 950,
         y: 820,
-        descripcion: 'Espacio tranquilo...',
+        categoria: 'Tecnología',
+        descripcion: 'Laboratorio de fabricación digital.',
         horario: '9:00 AM – 8:00 PM',
-        servicios: ['Mesas'],
-        reglas: ['Silencio'],
+        servicios: ['Modelado 3D'],
+        reglas: ['Costo material'],
         galeria: ['assets/multimedia/vr_1.png'],
       ),
       Area(
         nombre: 'Cabina podcast',
         x: 480,
         y: 240,
-        descripcion:
-            'Espacio acondicionado para grabación de audio, entrevistas y producción de contenido digital.',
+        categoria: 'Tecnología',
+        descripcion: 'Grabación de audio profesional.',
         horario: '9:00 AM – 8:00 PM',
-        servicios: [
-          'Micrófonos profesionales',
-          'Aislamiento acústico',
-          'Mesa de grabación',
-          'Equipo básico de audio',
-        ],
-        reglas: [
-          'Uso exclusivo con reservación',
-          'No alimentos ni bebidas',
-          'Cuidar el equipo',
-        ],
-        galeria: ['assets/multimedia/vr_1.png', 'assets/multimedia/vr_3.png'],
+        servicios: ['Grabación'],
+        reglas: ['Reservación'],
+        galeria: ['assets/multimedia/vr_1.png'],
         sePuedeRentar: true,
-        infoRenta:
-            'Requiere solicitud con al menos 2 semanas de anticipación. Enviar correo a recepcion@biblioteca.gob.mx',
       ),
     ],
   };
-
   void closePanel() {
     isPanelOpen.value = false;
 
@@ -346,5 +344,23 @@ class HomeController extends GetxController {
   void resetZoom() {
     // Volvemos a la matriz identidad (escala 1:1, posición 0,0)
     transformationController.value = Matrix4.identity();
+  }
+
+  var categoriaSeleccionada = ''.obs; // Observable para el filtro
+
+  void filtrarPorCategoria(String categoria) {
+    if (categoriaSeleccionada.value == categoria) {
+      categoriaSeleccionada.value = ''; // Si toca la misma, limpiamos filtro
+    } else {
+      categoriaSeleccionada.value = categoria;
+    }
+  }
+
+  void setCategoria(String cat) {
+    if (categoriaSeleccionada.value == cat) {
+      categoriaSeleccionada.value = ''; // Limpiar filtro si toca el mismo
+    } else {
+      categoriaSeleccionada.value = cat;
+    }
   }
 }

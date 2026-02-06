@@ -14,6 +14,7 @@ class MapaPiso extends StatelessWidget {
   final String image;
   final List<Area> areas;
   final String currentQuery;
+  final String? selectedCategory; 
   final int missionStep;
   final Function(Area) onAreaTap;
   final TransformationController transformationController;
@@ -23,6 +24,7 @@ class MapaPiso extends StatelessWidget {
     required this.image,
     required this.areas,
     required this.currentQuery,
+    this.selectedCategory,
     required this.missionStep,
     required this.onAreaTap,
     required this.transformationController,
@@ -30,20 +32,26 @@ class MapaPiso extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // FILTRADO DE ÁREAS
+    final visibleAreas = areas.where((area) {
+      if (currentQuery.isNotEmpty) return true; // Prioridad a búsqueda manual
+      if (selectedCategory != null && selectedCategory!.isNotEmpty) {
+        return area.categoria == selectedCategory;
+      }
+      return true;
+    }).toList();
+
     return InteractiveViewer(
       transformationController: transformationController,
-      constrained: false, // Permite que el contenido sea más grande que la vista
-      boundaryMargin: const EdgeInsets.all(1500), // Libertad de movimiento
+      constrained: false, 
+      boundaryMargin: const EdgeInsets.all(2000), 
       minScale: 0.1,
       maxScale: 5.0,
       child: Stack(
         clipBehavior: Clip.none,
         children: [
-          Image.asset(
-            image,
-            fit: BoxFit.none, // Evita distorsión de coordenadas
-          ),
-          ...areas.map((area) {
+          Image.asset(image, fit: BoxFit.none),
+          ...visibleAreas.map((area) {
             final bool isFound = currentQuery.isNotEmpty &&
                 _removeAccents(area.nombre).contains(_removeAccents(currentQuery));
 
@@ -53,10 +61,7 @@ class MapaPiso extends StatelessWidget {
               child: GestureDetector(
                 behavior: HitTestBehavior.opaque,
                 onTap: () => onAreaTap(area),
-                child: _PulseMarker(
-                  nombre: area.nombre,
-                  isHighlighted: isFound,
-                ),
+                child: _PulseMarker(nombre: area.nombre, isHighlighted: isFound),
               ),
             );
           }).toList(),
@@ -66,30 +71,27 @@ class MapaPiso extends StatelessWidget {
   }
 }
 
+// Widget de marcador con pulso animado
 class _PulseMarker extends StatefulWidget {
   final String nombre;
   final bool isHighlighted;
   const _PulseMarker({required this.nombre, required this.isHighlighted});
-
   @override
   State<_PulseMarker> createState() => _PulseMarkerState();
 }
 
 class _PulseMarkerState extends State<_PulseMarker> with SingleTickerProviderStateMixin {
   late AnimationController _controller;
-
   @override
   void initState() {
     super.initState();
     _controller = AnimationController(vsync: this, duration: const Duration(seconds: 2))..repeat();
   }
-
   @override
   void dispose() {
     _controller.dispose();
     super.dispose();
   }
-
   @override
   Widget build(BuildContext context) {
     final Color mainColor = widget.isHighlighted ? Colors.amber : Colors.indigo;
@@ -120,22 +122,9 @@ class _PulseMarkerState extends State<_PulseMarker> with SingleTickerProviderSta
         ),
         const SizedBox(height: 4),
         Container(
-          constraints: const BoxConstraints(maxWidth: 120),
           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
-          decoration: BoxDecoration(
-            color: widget.isHighlighted ? Colors.amber : Colors.black.withOpacity(0.7),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Text(
-            widget.nombre.toUpperCase(),
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: widget.isHighlighted ? 10 : 8,
-              fontWeight: widget.isHighlighted ? FontWeight.bold : FontWeight.w500,
-              color: widget.isHighlighted ? Colors.black : Colors.white,
-              decoration: TextDecoration.none,
-            ),
-          ),
+          decoration: BoxDecoration(color: widget.isHighlighted ? Colors.amber : Colors.black87, borderRadius: BorderRadius.circular(8)),
+          child: Text(widget.nombre.toUpperCase(), style: TextStyle(fontSize: 8, color: widget.isHighlighted ? Colors.black : Colors.white, fontWeight: FontWeight.bold)),
         ),
       ],
     );
