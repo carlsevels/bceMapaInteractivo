@@ -240,25 +240,23 @@ class HomeController extends GetxController {
     });
   }
 
-void onAreaSelected(Area area) {
+  void onAreaSelected(Area area) {
+    visibleArea.value = area;
+    selectedArea.value = area;
+    isPanelOpen.value = true;
 
-
-  visibleArea.value = area;
-  selectedArea.value = area;
-  isPanelOpen.value = true;
-
-  if (missionStep.value == 3) {
-    missionStep.value = 0;
-    Get.snackbar(
-      "¡MISIÓN COMPLETADA!",
-      "Has encontrado el área correctamente.",
-      snackPosition: SnackPosition.TOP,
-      backgroundColor: Colors.amber,
-      colorText: Colors.black,
-      icon: const Icon(Icons.emoji_events, color: Colors.black, size: 35),
-    );
+    if (missionStep.value == 3) {
+      missionStep.value = 0;
+      Get.snackbar(
+        "¡MISIÓN COMPLETADA!",
+        "Has encontrado el área correctamente.",
+        snackPosition: SnackPosition.TOP,
+        backgroundColor: Colors.amber,
+        colorText: Colors.black,
+        icon: const Icon(Icons.emoji_events, color: Colors.black, size: 35),
+      );
+    }
   }
-}
 
   @override
   void onInit() {
@@ -327,5 +325,26 @@ void onAreaSelected(Area area) {
     }
 
     return text.toLowerCase();
+  }
+
+  // En tu HomeController
+  final TransformationController transformationController =
+      TransformationController();
+
+  void zoomIn() {
+    final Matrix4 current = transformationController.value;
+    // Multiplicamos la escala actual por 1.2
+    transformationController.value = current.clone()..scale(1.2);
+  }
+
+  void zoomOut() {
+    final Matrix4 current = transformationController.value;
+    // Multiplicamos la escala actual por 0.8
+    transformationController.value = current.clone()..scale(0.8);
+  }
+
+  void resetZoom() {
+    // Volvemos a la matriz identidad (escala 1:1, posición 0,0)
+    transformationController.value = Matrix4.identity();
   }
 }

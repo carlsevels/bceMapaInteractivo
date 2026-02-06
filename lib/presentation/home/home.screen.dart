@@ -50,11 +50,13 @@ class HomeScreen extends GetView<HomeController> {
                       currentQuery: controller.query.value,
                       missionStep: controller.missionStep.value,
                       onAreaTap: controller.onAreaSelected,
+                      transformationController: controller.transformationController,
                     ),
                   ),
 
                   _buildFloatingFloorIndicator(),
                   _buildFloatingMenuButton(),
+                  _buildZoomControls(),
 
                   Obx(
                     () => controller.missionStep.value > 0
@@ -85,6 +87,55 @@ class HomeScreen extends GetView<HomeController> {
       ),
     );
   }
+
+  Widget _buildZoomControls() {
+    return Positioned(
+      bottom: 30,
+      right: 30,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          _zoomButton(
+            icon: Icons.add,
+            tooltip: "Aumentar Zoom",
+            onPressed: () => controller.zoomIn(), // CONECTADO
+          ),
+          const SizedBox(height: 12),
+          _zoomButton(
+            icon: Icons.fullscreen_exit,
+            tooltip: "Restaurar vista",
+            onPressed: () => controller.resetZoom(), // CONECTADO
+          ),
+          const SizedBox(height: 12),
+          _zoomButton(
+            icon: Icons.remove,
+            tooltip: "Disminuir Zoom",
+            onPressed: () => controller.zoomOut(), // CONECTADO
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _zoomButton({
+    required IconData icon,
+    required VoidCallback onPressed,
+    required String tooltip,
+  }) {
+    return FloatingActionButton(
+      heroTag: null, // Necesario para evitar conflictos entre múltiples FABs
+      mini: true,
+      backgroundColor: Colors.white,
+      elevation: 6,
+      onPressed: onPressed,
+      tooltip: tooltip,
+      child: Icon(icon, color: Colors.cyan[800], size: 22),
+    );
+  }
+
+  // ---------------------------------------------------------------------------
+  // PANELES Y BOTONES EXISTENTES
+  // ---------------------------------------------------------------------------
 
   Widget _buildRightDetailPanel() {
     final Area? area = controller.visibleArea.value;
@@ -168,6 +219,7 @@ class HomeScreen extends GetView<HomeController> {
         final locked = controller.missionStep.value > 0;
 
         return FloatingActionButton.extended(
+          heroTag: "btnMenu",
           elevation: 8,
           backgroundColor: locked
               ? Colors.grey[800]
@@ -224,10 +276,6 @@ class HomeScreen extends GetView<HomeController> {
     }
   }
 
-  // ---------------------------------------------------------------------------
-  // SIDE NAV
-  // ---------------------------------------------------------------------------
-
   Widget _buildSideNavigation(BuildContext context) {
     return Container(
       color: Colors.orange[600],
@@ -246,16 +294,13 @@ class HomeScreen extends GetView<HomeController> {
               ),
             ),
             const SizedBox(height: 40),
-
             Obx(
               () => _highlightArea(
                 active: controller.missionStep.value == 2,
                 child: _buildHugeSearch(),
               ),
             ),
-
             const SizedBox(height: 50),
-
             const Text(
               'SELECCIONA NIVEL',
               style: TextStyle(
@@ -265,16 +310,13 @@ class HomeScreen extends GetView<HomeController> {
                 letterSpacing: 1.2,
               ),
             ),
-
             const SizedBox(height: 20),
-
             Obx(
               () => _highlightArea(
                 active: controller.missionStep.value == 1,
                 child: _buildFloorList(),
               ),
             ),
-
             const SizedBox(height: 30),
             _buildHelpButton(),
           ],
@@ -282,10 +324,6 @@ class HomeScreen extends GetView<HomeController> {
       ),
     );
   }
-
-  // ---------------------------------------------------------------------------
-  // SEARCH
-  // ---------------------------------------------------------------------------
 
   Widget _buildHugeSearch() {
     return Column(
@@ -295,7 +333,6 @@ class HomeScreen extends GetView<HomeController> {
           onChanged: (value) {
             controller.query.value = value;
             controller.buscarSugerencias(value);
-
             if (controller.missionStep.value == 2 && value.length >= 3) {
               controller.missionStep.value = 3;
             }
@@ -314,7 +351,6 @@ class HomeScreen extends GetView<HomeController> {
             ),
           ),
         ),
-
         Obx(
           () => controller.sugerencias.isEmpty
               ? const SizedBox.shrink()
@@ -341,10 +377,6 @@ class HomeScreen extends GetView<HomeController> {
     );
   }
 
-  // ---------------------------------------------------------------------------
-  // FLOORS
-  // ---------------------------------------------------------------------------
-
   Widget _buildFloorList() {
     return Column(
       children: [2, 1].map((i) {
@@ -357,7 +389,6 @@ class HomeScreen extends GetView<HomeController> {
               controller.query.value = '';
               controller.searchController.clear();
               controller.sugerencias.clear();
-
               if (controller.missionStep.value == 1) {
                 controller.missionStep.value = 2;
               }
@@ -400,10 +431,6 @@ class HomeScreen extends GetView<HomeController> {
     );
   }
 
-  // ---------------------------------------------------------------------------
-  // EXTRAS
-  // ---------------------------------------------------------------------------
-
   Widget _highlightArea({required bool active, required Widget child}) {
     return AnimatedContainer(
       duration: const Duration(milliseconds: 300),
@@ -418,7 +445,6 @@ class HomeScreen extends GetView<HomeController> {
 
   Widget _buildMissionBanner() {
     String msg = "";
-
     if (controller.missionStep.value == 1) {
       msg = "¡Hola! Para empezar, dime en qué piso estás.";
     } else if (controller.missionStep.value == 2) {
