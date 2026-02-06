@@ -6,8 +6,16 @@ class HomeController extends GetxController {
   //TODO: Implement HomeController
   final RxInt missionStep = 0.obs;
   final RxBool isMenuOpen = true.obs;
+
   final TextEditingController searchController = TextEditingController();
+
   final Rx<Area?> selectedArea = Rx<Area?>(null);
+
+  // 🔥 ESTE ES EL FIX CLAVE
+  final Rx<Area?> visibleArea = Rx<Area?>(null);
+
+  final RxBool isPanelOpen = false.obs;
+
   final RxInt pisoActual = 1.obs;
   final RxString query = ''.obs;
   final RxList<Area> sugerencias = <Area>[].obs;
@@ -223,23 +231,35 @@ class HomeController extends GetxController {
     ],
   };
 
-  void onAreaSelected(Area area) {
-    query.value = "";
-    searchController.clear();
-    selectedArea.value = area;
+  void closePanel() {
+    isPanelOpen.value = false;
 
-    if (missionStep.value == 3) {
-      missionStep.value = 0;
-      Get.snackbar(
-        "¡MISIÓN COMPLETADA!",
-        "Has encontrado el área correctamente.",
-        snackPosition: SnackPosition.TOP,
-        backgroundColor: Colors.amber,
-        colorText: Colors.black,
-        icon: const Icon(Icons.emoji_events, color: Colors.black, size: 35),
-      );
-    }
+    Future.delayed(const Duration(milliseconds: 800), () {
+      visibleArea.value = null;
+      selectedArea.value = null;
+    });
   }
+
+void onAreaSelected(Area area) {
+  query.value = "";
+  searchController.clear();
+
+  visibleArea.value = area;
+  selectedArea.value = area;
+  isPanelOpen.value = true;
+
+  if (missionStep.value == 3) {
+    missionStep.value = 0;
+    Get.snackbar(
+      "¡MISIÓN COMPLETADA!",
+      "Has encontrado el área correctamente.",
+      snackPosition: SnackPosition.TOP,
+      backgroundColor: Colors.amber,
+      colorText: Colors.black,
+      icon: const Icon(Icons.emoji_events, color: Colors.black, size: 35),
+    );
+  }
+}
 
   @override
   void onInit() {

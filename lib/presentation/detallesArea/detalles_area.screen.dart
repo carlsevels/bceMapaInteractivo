@@ -71,13 +71,12 @@ class DetallesAreaScreen extends StatelessWidget {
               ),
             ],
           ),
-          // Botón cerrar flotante para no depender del AppBar
           Positioned(
             top: 12,
             right: 12,
             child: SafeArea(
               child: FloatingActionButton.small(
-                onPressed: () => controller.selectedArea.value = null,
+                onPressed: controller.closePanel,
                 backgroundColor: Colors.white.withOpacity(0.9),
                 child: const Icon(Icons.close, color: Colors.black87),
               ),
@@ -87,8 +86,6 @@ class DetallesAreaScreen extends StatelessWidget {
       ),
     );
   }
-
-  // --- COMPONENTES DE DISEÑO UNIFICADOS ---
 
   Widget _buildCompactHeader(Area area) {
     return SliverAppBar(

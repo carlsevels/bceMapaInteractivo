@@ -1,0 +1,69 @@
+# ------------------------------
+# Flutter / Dart
+# ------------------------------
+.dart_tool/
+.packages
+.pub-cache/
+.pub/
+build/
+.flutter-plugins
+.flutter-plugins-dependencies
+
+# ------------------------------
+# IDEs
+# ------------------------------
+.idea/
+.vscode/
+*.iml
+
+# ------------------------------
+# macOS
+# ------------------------------
+.DS_Store
+
+# ------------------------------
+# Android
+# ------------------------------
+android/.gradle/
+android/captures/
+android/local.properties
+android/key.properties
+*.jks
+
+# ------------------------------
+# iOS / macOS
+# ------------------------------
+ios/Pods/
+ios/.symlinks/
+ios/Flutter/Flutter.framework
+ios/Flutter/Flutter.podspec
+ios/Flutter/App.framework
+ios/Flutter/Generated.xcconfig
+
+macos/Pods/
+macos/Flutter/ephemeral/
+macos/Flutter/GeneratedPluginRegistrant.swift
+
+# ------------------------------
+# Logs
+# ------------------------------
+*.log
+
+# ------------------------------
+# Firebase / Secrets (si usas)
+# ------------------------------
+google-services.json
+GoogleService-Info.plist
+firebase_options.dart
+
+# ------------------------------
+# Coverage
+# ------------------------------
+coverage/
+
+# ------------------------------
+# Temp / cache
+# ------------------------------
+*.swp
+*.tmp
+*.temp

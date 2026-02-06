@@ -1,94 +1,127 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+
 import 'package:mapa_interactivo/infrastructure/models/area.dart';
 import 'package:mapa_interactivo/presentation/home/controllers/home.controller.dart';
 import 'package:mapa_interactivo/presentation/home/localWidgets/mapaPiso.dart';
 import 'package:mapa_interactivo/presentation/screens.dart';
 
 class HomeScreen extends GetView<HomeController> {
-  HomeScreen({Key? key}) : super(key: key);
+  HomeScreen({Key? key}) : super(key: key) {
+    Get.put(HomeController());
+  }
 
   @override
   Widget build(BuildContext context) {
-    Get.put(HomeController());
-
     return Scaffold(
       backgroundColor: Colors.white,
-      body: Row(
+      body: Stack(
         children: [
+          /// MAPA + CONTENIDO CENTRAL
           Obx(
-            () => AnimatedContainer(
+            () => AnimatedPadding(
               duration: const Duration(milliseconds: 400),
               curve: Curves.easeInOut,
-              width: controller.isMenuOpen.value ? 350 : 0,
+              padding: EdgeInsets.only(
+                left: controller.isMenuOpen.value ? 350 : 0,
+                right: controller.selectedArea.value != null ? 450 : 0,
+              ),
+              child: Stack(
+                children: [
+                  AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 450),
+                    transitionBuilder: (child, animation) {
+                      return FadeTransition(
+                        opacity: animation,
+                        child: SlideTransition(
+                          position: Tween<Offset>(
+                            begin: const Offset(0.05, 0),
+                            end: Offset.zero,
+                          ).animate(animation),
+                          child: child,
+                        ),
+                      );
+                    },
+                    child: MapaPiso(
+                      key: ValueKey(controller.pisoActual.value),
+                      image: 'assets/piso_${controller.pisoActual.value}.png',
+                      areas:
+                          controller.pisos[controller.pisoActual.value] ?? [],
+                      currentQuery: controller.query.value,
+                      missionStep: controller.missionStep.value,
+                      onAreaTap: controller.onAreaSelected,
+                    ),
+                  ),
+
+                  _buildFloatingFloorIndicator(),
+                  _buildFloatingMenuButton(),
+
+                  Obx(
+                    () => controller.missionStep.value > 0
+                        ? _buildMissionBanner()
+                        : const SizedBox.shrink(),
+                  ),
+                ],
+              ),
+            ),
+          ),
+
+          /// MENU IZQUIERDO
+          Obx(
+            () => AnimatedPositioned(
+              duration: const Duration(milliseconds: 400),
+              curve: Curves.easeInOut,
+              left: controller.isMenuOpen.value ? 0 : -350,
+              top: 0,
+              bottom: 0,
+              width: 350,
               child: _buildSideNavigation(context),
             ),
           ),
 
-          Expanded(
-            child: Row(
-              children: [
-                Expanded(
-                  child: Stack(
-                    children: [
-                      Obx(
-                        () => MapaPiso(
-                          image:
-                              'assets/piso_${controller.pisoActual.value}.png',
-                          areas:
-                              controller.pisos[controller.pisoActual.value] ??
-                                  [],
-                          currentQuery: controller.query.value,
-                          missionStep: controller.missionStep.value,
-                          onAreaTap: controller.onAreaSelected,
-                        ),
-                      ),
-                      _buildFloatingFloorIndicator(),
-                      _buildFloatingMenuButton(),
-                      Obx(
-                        () => controller.missionStep.value > 0
-                            ? _buildMissionBanner()
-                            : const SizedBox.shrink(),
-                      ),
-                    ],
-                  ),
-                ),
-
-                Obx(() => _buildRightDetailPanel()),
-              ],
-            ),
-          ),
+          /// PANEL DERECHO
+          Obx(() => _buildRightDetailPanel()),
         ],
       ),
     );
   }
-
-  // ---------------- PANEL DERECHO ----------------
 
   Widget _buildRightDetailPanel() {
-    if (controller.selectedArea.value == null) {
-      return const SizedBox.shrink();
-    }
+    final Area? area = controller.visibleArea.value;
 
-    final Area areaSeleccionada = controller.selectedArea.value!;
-
-    return Container(
-      width: 450,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.15),
-            blurRadius: 20,
-            offset: const Offset(-5, 0),
+    return Obx(
+      () => AnimatedPositioned(
+        duration: const Duration(milliseconds: 800),
+        curve: Curves.easeOutCubic,
+        right: controller.isPanelOpen.value ? 0 : -450,
+        top: 0,
+        bottom: 0,
+        width: 450,
+        child: IgnorePointer(
+          ignoring: !controller.isPanelOpen.value,
+          child: AnimatedOpacity(
+            duration: const Duration(milliseconds: 300),
+            opacity: controller.isPanelOpen.value ? 1 : 0,
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.15),
+                    blurRadius: 20,
+                    offset: const Offset(-5, 0),
+                  ),
+                ],
+              ),
+              child: area == null
+                  ? const SizedBox.shrink()
+                  : DetallesAreaScreen(area: area),
+            ),
           ),
-        ],
+        ),
       ),
-      child: DetallesAreaScreen(area: areaSeleccionada),
     );
   }
-
-  // ---------------- FLOATING ----------------
 
   Widget _buildFloatingFloorIndicator() {
     return Positioned(
@@ -132,19 +165,24 @@ class HomeScreen extends GetView<HomeController> {
       bottom: 30,
       left: 30,
       child: Obx(() {
-        final bool locked = controller.missionStep.value > 0;
+        final locked = controller.missionStep.value > 0;
+
         return FloatingActionButton.extended(
           elevation: 8,
           backgroundColor: locked
               ? Colors.grey[800]
-              : (controller.isMenuOpen.value ? Colors.white : Colors.cyan),
+              : controller.isMenuOpen.value
+              ? Colors.white
+              : Colors.cyan,
           onPressed: () => _handleMenuToggle(locked),
           label: Text(
             controller.isMenuOpen.value ? "OCULTAR MENÚ" : "MOSTRAR MENÚ",
             style: TextStyle(
               color: locked
                   ? Colors.white38
-                  : (controller.isMenuOpen.value ? Colors.cyan : Colors.white),
+                  : controller.isMenuOpen.value
+                  ? Colors.cyan
+                  : Colors.white,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -154,7 +192,9 @@ class HomeScreen extends GetView<HomeController> {
                 : Icons.menu_open,
             color: locked
                 ? Colors.white38
-                : (controller.isMenuOpen.value ? Colors.cyan : Colors.white),
+                : controller.isMenuOpen.value
+                ? Colors.cyan
+                : Colors.white,
           ),
         );
       }),
@@ -184,11 +224,12 @@ class HomeScreen extends GetView<HomeController> {
     }
   }
 
-  // ---------------- SIDE NAV ----------------
+  // ---------------------------------------------------------------------------
+  // SIDE NAV
+  // ---------------------------------------------------------------------------
 
   Widget _buildSideNavigation(BuildContext context) {
     return Container(
-      height: Get.size.height,
       color: Colors.orange[600],
       child: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 40),
@@ -242,7 +283,9 @@ class HomeScreen extends GetView<HomeController> {
     );
   }
 
-  // ---------------- SEARCH + SUGERENCIAS ----------------
+  // ---------------------------------------------------------------------------
+  // SEARCH
+  // ---------------------------------------------------------------------------
 
   Widget _buildHugeSearch() {
     return Column(
@@ -298,7 +341,9 @@ class HomeScreen extends GetView<HomeController> {
     );
   }
 
-  // ---------------- FLOORS ----------------
+  // ---------------------------------------------------------------------------
+  // FLOORS
+  // ---------------------------------------------------------------------------
 
   Widget _buildFloorList() {
     return Column(
@@ -312,6 +357,7 @@ class HomeScreen extends GetView<HomeController> {
               controller.query.value = '';
               controller.searchController.clear();
               controller.sugerencias.clear();
+
               if (controller.missionStep.value == 1) {
                 controller.missionStep.value = 2;
               }
@@ -344,8 +390,7 @@ class HomeScreen extends GetView<HomeController> {
                     ),
                   ),
                   const Spacer(),
-                  if (sel)
-                    Icon(Icons.check_circle, color: Colors.orange[600]),
+                  if (sel) Icon(Icons.check_circle, color: Colors.orange[600]),
                 ],
               ),
             ),
@@ -355,7 +400,9 @@ class HomeScreen extends GetView<HomeController> {
     );
   }
 
-  // ---------------- EXTRAS ----------------
+  // ---------------------------------------------------------------------------
+  // EXTRAS
+  // ---------------------------------------------------------------------------
 
   Widget _highlightArea({required bool active, required Widget child}) {
     return AnimatedContainer(
@@ -374,11 +421,9 @@ class HomeScreen extends GetView<HomeController> {
 
     if (controller.missionStep.value == 1) {
       msg = "¡Hola! Para empezar, dime en qué piso estás.";
-    }
-    if (controller.missionStep.value == 2) {
+    } else if (controller.missionStep.value == 2) {
       msg = "¿Qué área buscas? Escríbela en el buscador.";
-    }
-    if (controller.missionStep.value == 3) {
+    } else if (controller.missionStep.value == 3) {
       msg = "¡Ya casi! Toca el marcador en el mapa para ver los detalles.";
     }
 
@@ -394,7 +439,7 @@ class HomeScreen extends GetView<HomeController> {
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
           child: Row(
             children: [
-              const Icon(Icons.auto_awesome, color: Colors.black87, size: 30),
+              const Icon(Icons.auto_awesome, size: 30),
               const SizedBox(width: 15),
               Expanded(
                 child: Text(
@@ -402,13 +447,12 @@ class HomeScreen extends GetView<HomeController> {
                   style: const TextStyle(
                     fontSize: 17,
                     fontWeight: FontWeight.bold,
-                    color: Colors.black87,
                   ),
                 ),
               ),
               IconButton(
                 onPressed: () => controller.missionStep.value = 0,
-                icon: const Icon(Icons.cancel, color: Colors.black54),
+                icon: const Icon(Icons.cancel),
               ),
             ],
           ),
