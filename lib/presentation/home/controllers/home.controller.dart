@@ -13,10 +13,11 @@ class HomeController extends GetxController {
   final RxString query = ''.obs;
   final RxList<Area> sugerencias = <Area>[].obs;
   final RxString categoriaSeleccionada = ''.obs;
-
-  // Controlador para el InteractiveViewer
-  final TransformationController transformationController =
-      TransformationController();
+  
+  // 🔹 CONTROL DE ZOOM
+  final RxInt zoomLevel = 0.obs;
+  final int maxZoomClicks = 5;
+  final TransformationController transformationController = TransformationController();
 
   final Map<int, List<Area>> pisos = {
     1: [
@@ -241,6 +242,22 @@ class HomeController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+
+    // 🔹 SINCRONIZACIÓN TOUCH/GESTOS -> zoomLevel
+    transformationController.addListener(() {
+      final double scale = transformationController.value.getMaxScaleOnAxis();
+      
+      // Mapeamos la escala física al rango de zoomLevel (-5 a 5)
+      // Ajustado para que scale 2.5 sea nivel 5 y scale 0.4 sea nivel -5
+      if (scale > 1.0) {
+        zoomLevel.value = ((scale - 1.0) / (2.5 - 1.0) * maxZoomClicks).round().clamp(0, maxZoomClicks);
+      } else if (scale < 1.0) {
+        zoomLevel.value = -((1.0 - scale) / (1.0 - 0.4) * maxZoomClicks).round().clamp(0, maxZoomClicks);
+      } else {
+        zoomLevel.value = 0;
+      }
+    });
+
     ever(pisoActual, (_) {
       if (missionStep.value == 1) missionStep.value = 2;
     });
@@ -272,7 +289,7 @@ class HomeController extends GetxController {
     visibleArea.value = area;
     selectedArea.value = area;
     isPanelOpen.value = true;
-    
+
     if (missionStep.value == 3) {
       missionStep.value = 0;
       Get.snackbar(
@@ -312,9 +329,7 @@ class HomeController extends GetxController {
     sugerencias.assignAll(resultados);
   }
 
-  // 🔹 MÉTODO ACTUALIZADO CON AUTO-ZOOM
   void seleccionarDesdeSugerencia(Area area) async {
-    // 1. Verificar si hay que cambiar de piso
     if (pisoActual.value != area.piso) {
       pisoActual.value = area.piso!;
       await Future.delayed(const Duration(milliseconds: 50));
@@ -324,33 +339,27 @@ class HomeController extends GetxController {
     searchController.text = area.nombre;
     sugerencias.clear();
 
-    // 2. Ejecutar el Zoom al punto exacto
     _aplicarZoomAutomatico(area);
-
-    // 3. Abrir el panel de detalles
-    //onAreaSelected(area);
+    onAreaSelected(area);
   }
 
   void _aplicarZoomAutomatico(Area area) {
-    const double zoomScale = 2.5; // Nivel de zoom
+    const double zoomScale = 2.5;
     final Size screenSize = Get.size;
 
-    // Calculamos el centro de la pantalla restando el ancho del menú si está abierto
     double centerX = screenSize.width / 2;
     if (isMenuOpen.value) {
-      centerX -= 175; // Ajuste para centrar en el espacio sobrante del menú
+      centerX -= 175;
     }
 
     final double x = centerX - (area.x * zoomScale);
     final double y = (screenSize.height / 2) - (area.y * zoomScale);
 
-    // Creamos la nueva matriz de transformación
-    final Matrix4 newMatrix = Matrix4.identity()
+    transformationController.value = Matrix4.identity()
       ..translate(x, y)
       ..scale(zoomScale);
-
-    // Aplicamos al controlador
-    transformationController.value = newMatrix;
+    
+    // Al centrar automáticamente, el listener actualizará el zoomLevel
   }
 
   String normalize(String text) {
@@ -362,17 +371,27 @@ class HomeController extends GetxController {
     return text.toLowerCase();
   }
 
-  void zoomIn() =>
+  // 🔹 MÉTODOS DE ZOOM CON LÍMITES DE CLIC
+  void zoomIn() {
+    if (zoomLevel.value < maxZoomClicks) {
       transformationController.value = transformationController.value.clone()
         ..scale(1.2);
-  void zoomOut() =>
+    }
+  }
+
+  void zoomOut() {
+    if (zoomLevel.value > -maxZoomClicks) {
       transformationController.value = transformationController.value.clone()
         ..scale(0.8);
-  void resetZoom() => transformationController.value = Matrix4.identity();
+    }
+  }
+
+  void resetZoom() {
+    transformationController.value = Matrix4.identity();
+    zoomLevel.value = 0;
+  }
 
   void setCategoria(String cat) {
-    categoriaSeleccionada.value = (categoriaSeleccionada.value == cat)
-        ? ''
-        : cat;
+    categoriaSeleccionada.value = (categoriaSeleccionada.value == cat) ? '' : cat;
   }
 }
