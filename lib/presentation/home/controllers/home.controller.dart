@@ -340,7 +340,7 @@ class HomeController extends GetxController {
     sugerencias.clear();
 
     _aplicarZoomAutomatico(area);
-    onAreaSelected(area);
+    //onAreaSelected(area);
   }
 
   void _aplicarZoomAutomatico(Area area) {
