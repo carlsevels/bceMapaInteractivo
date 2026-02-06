@@ -11,6 +11,7 @@ class HomeScreen extends GetView<HomeController> {
   @override
   Widget build(BuildContext context) {
     Get.put(HomeController());
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: Row(
@@ -36,7 +37,7 @@ class HomeScreen extends GetView<HomeController> {
                               'assets/piso_${controller.pisoActual.value}.png',
                           areas:
                               controller.pisos[controller.pisoActual.value] ??
-                              [],
+                                  [],
                           currentQuery: controller.query.value,
                           missionStep: controller.missionStep.value,
                           onAreaTap: controller.onAreaSelected,
@@ -53,7 +54,6 @@ class HomeScreen extends GetView<HomeController> {
                   ),
                 ),
 
-                // PANEL DERECHO DE DETALLES
                 Obx(() => _buildRightDetailPanel()),
               ],
             ),
@@ -63,8 +63,12 @@ class HomeScreen extends GetView<HomeController> {
     );
   }
 
+  // ---------------- PANEL DERECHO ----------------
+
   Widget _buildRightDetailPanel() {
-    if (controller.selectedArea.value == null) return const SizedBox.shrink();
+    if (controller.selectedArea.value == null) {
+      return const SizedBox.shrink();
+    }
 
     final Area areaSeleccionada = controller.selectedArea.value!;
 
@@ -83,6 +87,8 @@ class HomeScreen extends GetView<HomeController> {
       child: DetallesAreaScreen(area: areaSeleccionada),
     );
   }
+
+  // ---------------- FLOATING ----------------
 
   Widget _buildFloatingFloorIndicator() {
     return Positioned(
@@ -178,87 +184,121 @@ class HomeScreen extends GetView<HomeController> {
     }
   }
 
+  // ---------------- SIDE NAV ----------------
+
   Widget _buildSideNavigation(BuildContext context) {
     return Container(
       height: Get.size.height,
       color: Colors.orange[600],
-      child: LayoutBuilder(
-        builder: (context, constraints) {
-          return SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 40),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  'BIBLIOTECA\nINTERACTIVA',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 34,
-                    height: 1.0,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 40),
-                Obx(
-                  () => _highlightArea(
-                    active: controller.missionStep.value == 2,
-                    child: _buildHugeSearch(),
-                  ),
-                ),
-                const SizedBox(height: 50),
-                const Text(
-                  'SELECCIONA NIVEL',
-                  style: TextStyle(
-                    color: Colors.white70,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w900,
-                    letterSpacing: 1.2,
-                  ),
-                ),
-                const SizedBox(height: 20),
-                Obx(
-                  () => _highlightArea(
-                    active: controller.missionStep.value == 1,
-                    child: _buildFloorList(),
-                  ),
-                ),
-                const SizedBox(height: 30),
-                _buildHelpButton(),
-              ],
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 40),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'BIBLIOTECA\nINTERACTIVA',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 34,
+                height: 1.0,
+                fontWeight: FontWeight.bold,
+              ),
             ),
-          );
-        },
+            const SizedBox(height: 40),
+
+            Obx(
+              () => _highlightArea(
+                active: controller.missionStep.value == 2,
+                child: _buildHugeSearch(),
+              ),
+            ),
+
+            const SizedBox(height: 50),
+
+            const Text(
+              'SELECCIONA NIVEL',
+              style: TextStyle(
+                color: Colors.white70,
+                fontSize: 14,
+                fontWeight: FontWeight.w900,
+                letterSpacing: 1.2,
+              ),
+            ),
+
+            const SizedBox(height: 20),
+
+            Obx(
+              () => _highlightArea(
+                active: controller.missionStep.value == 1,
+                child: _buildFloorList(),
+              ),
+            ),
+
+            const SizedBox(height: 30),
+            _buildHelpButton(),
+          ],
+        ),
       ),
     );
   }
 
+  // ---------------- SEARCH + SUGERENCIAS ----------------
+
   Widget _buildHugeSearch() {
-    return TextField(
-      controller: controller.searchController,
-      onChanged: (value) {
-        controller.query.value = value;
-        if (controller.missionStep.value == 2 && value.length >= 3)
-          controller.missionStep.value = 3;
-      },
-      style: const TextStyle(color: Colors.white, fontSize: 18),
-      decoration: InputDecoration(
-        filled: true,
-        fillColor: Colors.white.withOpacity(0.1),
-        hintText: '¿Qué buscas hoy?',
-        hintStyle: const TextStyle(color: Colors.white60),
-        prefixIcon: const Icon(
-          Icons.search_rounded,
-          color: Colors.white,
-          size: 24,
+    return Column(
+      children: [
+        TextField(
+          controller: controller.searchController,
+          onChanged: (value) {
+            controller.query.value = value;
+            controller.buscarSugerencias(value);
+
+            if (controller.missionStep.value == 2 && value.length >= 3) {
+              controller.missionStep.value = 3;
+            }
+          },
+          style: const TextStyle(color: Colors.white, fontSize: 18),
+          decoration: InputDecoration(
+            filled: true,
+            fillColor: Colors.white.withOpacity(0.1),
+            hintText: '¿Qué buscas hoy?',
+            hintStyle: const TextStyle(color: Colors.white60),
+            prefixIcon: const Icon(Icons.search_rounded, color: Colors.white),
+            contentPadding: const EdgeInsets.symmetric(vertical: 20),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(15),
+              borderSide: BorderSide.none,
+            ),
+          ),
         ),
-        contentPadding: const EdgeInsets.symmetric(vertical: 20),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(15),
-          borderSide: BorderSide.none,
+
+        Obx(
+          () => controller.sugerencias.isEmpty
+              ? const SizedBox.shrink()
+              : Container(
+                  margin: const EdgeInsets.only(top: 10),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                  child: Column(
+                    children: controller.sugerencias.map((area) {
+                      return ListTile(
+                        leading: const Icon(Icons.place),
+                        title: Text(area.nombre),
+                        subtitle: Text('Piso ${area.piso}'),
+                        onTap: () =>
+                            controller.seleccionarDesdeSugerencia(area),
+                      );
+                    }).toList(),
+                  ),
+                ),
         ),
-      ),
+      ],
     );
   }
+
+  // ---------------- FLOORS ----------------
 
   Widget _buildFloorList() {
     return Column(
@@ -271,8 +311,10 @@ class HomeScreen extends GetView<HomeController> {
               controller.pisoActual.value = i;
               controller.query.value = '';
               controller.searchController.clear();
-              if (controller.missionStep.value == 1)
+              controller.sugerencias.clear();
+              if (controller.missionStep.value == 1) {
                 controller.missionStep.value = 2;
+              }
             },
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 300),
@@ -302,7 +344,8 @@ class HomeScreen extends GetView<HomeController> {
                     ),
                   ),
                   const Spacer(),
-                  if (sel) Icon(Icons.check_circle, color: Colors.orange[600]),
+                  if (sel)
+                    Icon(Icons.check_circle, color: Colors.orange[600]),
                 ],
               ),
             ),
@@ -311,6 +354,8 @@ class HomeScreen extends GetView<HomeController> {
       }).toList(),
     );
   }
+
+  // ---------------- EXTRAS ----------------
 
   Widget _highlightArea({required bool active, required Widget child}) {
     return AnimatedContainer(
@@ -326,14 +371,16 @@ class HomeScreen extends GetView<HomeController> {
 
   Widget _buildMissionBanner() {
     String msg = "";
-    IconData icon = Icons.auto_awesome;
 
-    if (controller.missionStep.value == 1)
+    if (controller.missionStep.value == 1) {
       msg = "¡Hola! Para empezar, dime en qué piso estás.";
-    if (controller.missionStep.value == 2)
+    }
+    if (controller.missionStep.value == 2) {
       msg = "¿Qué área buscas? Escríbela en el buscador.";
-    if (controller.missionStep.value == 3)
+    }
+    if (controller.missionStep.value == 3) {
       msg = "¡Ya casi! Toca el marcador en el mapa para ver los detalles.";
+    }
 
     return Positioned(
       bottom: 40,
@@ -347,7 +394,7 @@ class HomeScreen extends GetView<HomeController> {
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
           child: Row(
             children: [
-              Icon(icon, color: Colors.black87, size: 30),
+              const Icon(Icons.auto_awesome, color: Colors.black87, size: 30),
               const SizedBox(width: 15),
               Expanded(
                 child: Text(

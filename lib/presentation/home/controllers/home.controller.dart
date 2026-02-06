@@ -10,6 +10,7 @@ class HomeController extends GetxController {
   final Rx<Area?> selectedArea = Rx<Area?>(null);
   final RxInt pisoActual = 1.obs;
   final RxString query = ''.obs;
+  final RxList<Area> sugerencias = <Area>[].obs;
 
   final count = 0.obs;
 
@@ -256,4 +257,56 @@ class HomeController extends GetxController {
   }
 
   void increment() => count.value++;
+
+  void seleccionarDesdeSugerencia(Area area) {
+    // Cambiar piso si es necesario
+    if (pisoActual.value != area.piso) {
+      pisoActual.value = area.piso!;
+    }
+
+    // Limpiar buscador
+    query.value = area.nombre;
+    searchController.text = area.nombre;
+    sugerencias.clear();
+
+    // Seleccionar área
+    onAreaSelected(area);
+  }
+
+  /// 🔹 BUSCAR
+  void buscarSugerencias(String query) {
+    if (query.trim().isEmpty) {
+      sugerencias.clear();
+      return;
+    }
+
+    final normalizedQuery = normalize(query);
+
+    final List<Area> resultados = [];
+
+    pisos.forEach((piso, areas) {
+      for (final area in areas) {
+        final nombreNormalizado = normalize(area.nombre);
+        final descripcionNormalizada = normalize(area.descripcion);
+
+        if (nombreNormalizado.contains(normalizedQuery) ||
+            descripcionNormalizada.contains(normalizedQuery)) {
+          resultados.add(area.copyWith(piso: piso));
+        }
+      }
+    });
+
+    sugerencias.assignAll(resultados);
+  }
+
+  String normalize(String text) {
+    const withAccents = 'áéíóúüñÁÉÍÓÚÜÑ';
+    const withoutAccents = 'aeiouunAEIOUUN';
+
+    for (int i = 0; i < withAccents.length; i++) {
+      text = text.replaceAll(withAccents[i], withoutAccents[i]);
+    }
+
+    return text.toLowerCase();
+  }
 }
