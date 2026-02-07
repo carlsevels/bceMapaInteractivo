@@ -79,7 +79,7 @@ class HomeController extends GetxController {
         horario: '8:30 AM – 7:30 PM',
         servicios: ['Venta alimentos'],
         reglas: ['Limpieza'],
-        galeria: ['assets/multimedia/vr_1.png'],
+        galeria: [],
       ),
       Area(
         nombre: 'Legado N.L.',
@@ -278,7 +278,7 @@ class HomeController extends GetxController {
         horario: '9:00 AM – 8:00 PM',
         servicios: ['Modelado 3D'],
         reglas: ['Costo material'],
-        galeria: ['assets/multimedia/vr_1.png'],
+        galeria: [],
       ),
       Area(
         nombre: 'Cabina podcast',

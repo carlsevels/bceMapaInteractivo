@@ -51,12 +51,15 @@ class DetallesAreaScreen extends StatelessWidget {
                           height: 1.5,
                         ),
                       ),
-
-                      const SizedBox(height: 24),
-                      _buildSectionLabel("Galería visual"),
-                      const SizedBox(height: 8),
-                      _buildCompactGallery(areaFinal.galeria),
-
+                      if (areaFinal.galeria.isNotEmpty)
+                        Column(
+                          children: [
+                            const SizedBox(height: 24),
+                            _buildSectionLabel("Galería visual"),
+                            const SizedBox(height: 8),
+                            _buildCompactGallery(areaFinal.galeria),
+                          ],
+                        ),
                       const SizedBox(height: 24),
                       _buildCompactInfoRow(areaFinal),
 
@@ -89,7 +92,7 @@ class DetallesAreaScreen extends StatelessWidget {
 
   Widget _buildCompactHeader(Area area) {
     return SliverAppBar(
-      expandedHeight: 180,
+      expandedHeight: area.galeria.isNotEmpty ? 180 : 50,
       automaticallyImplyLeading: false,
       pinned: true,
       backgroundColor: colorAccent,
@@ -108,7 +111,7 @@ class DetallesAreaScreen extends StatelessWidget {
           children: [
             area.galeria.isNotEmpty
                 ? Image.asset(area.galeria.first, fit: BoxFit.cover)
-                : Container(color: Colors.grey.shade300),
+                : Container(color: Colors.cyan),
             const DecoratedBox(
               decoration: BoxDecoration(
                 gradient: LinearGradient(
