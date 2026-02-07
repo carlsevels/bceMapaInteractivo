@@ -13,11 +13,12 @@ class HomeController extends GetxController {
   final RxString query = ''.obs;
   final RxList<Area> sugerencias = <Area>[].obs;
   final RxString categoriaSeleccionada = ''.obs;
-  
+
   // 🔹 CONTROL DE ZOOM
   final RxInt zoomLevel = 0.obs;
   final int maxZoomClicks = 5;
-  final TransformationController transformationController = TransformationController();
+  final TransformationController transformationController =
+      TransformationController();
 
   final Map<int, List<Area>> pisos = {
     1: [
@@ -30,7 +31,7 @@ class HomeController extends GetxController {
         horario: 'Lunes a Viernes · 9:00 AM – 8:00 PM',
         servicios: ['Orientación', 'Apoyo catálogo'],
         reglas: ['Formar fila', 'No alimentos'],
-        galeria: ['assets/multimedia/vr_1.png', 'assets/multimedia/vr_1.png'],
+        galeria: ['modulo/imagen1.jpeg', 'modulo/imagen2.jpeg'],
       ),
       Area(
         nombre: 'Área de inclusión',
@@ -41,7 +42,11 @@ class HomeController extends GetxController {
         horario: 'Lunes a Sábado · 9:00 AM – 7:00 PM',
         servicios: ['Braille', 'Audiolibros'],
         reglas: ['Prioridad discapacidad'],
-        galeria: ['assets/multimedia/vr_1.png'],
+        galeria: [
+          'inclusion/imagen1.jpeg',
+          'inclusion/imagen2.jpeg',
+          'inclusion/imagen3.jpeg',
+        ],
       ),
       Area(
         nombre: 'Sala multipropósito',
@@ -52,7 +57,7 @@ class HomeController extends GetxController {
         horario: 'Según programación',
         servicios: ['Talleres', 'Conferencias'],
         reglas: ['Acceso con eventos'],
-        galeria: ['assets/multimedia/vr_1.png'],
+        galeria: ['multiproposito/imagen1.jpeg', 'multiproposito/imagen2.jpeg'],
       ),
       Area(
         nombre: 'Sala de juntas',
@@ -63,7 +68,7 @@ class HomeController extends GetxController {
         horario: 'Lunes a Viernes · 10:00 AM – 6:00 PM',
         servicios: ['Reservación'],
         reglas: ['No alimentos'],
-        galeria: ['assets/multimedia/vr_1.png'],
+        galeria: ['salaDeJuntas/imagen1.jpeg'],
       ),
       Area(
         nombre: 'Cafetería',
@@ -85,7 +90,11 @@ class HomeController extends GetxController {
         horario: 'Martes a Domingo · 10:00 AM – 6:00 PM',
         servicios: ['Exposiciones'],
         reglas: ['No tocar'],
-        galeria: ['assets/multimedia/vr_1.png'],
+        galeria: [
+          'legadoNL/imagen1.jpeg',
+          'legadoNL/imagen2.jpeg',
+          'legadoNL/imagen3.jpeg',
+        ],
       ),
       Area(
         nombre: 'Acervo',
@@ -96,7 +105,12 @@ class HomeController extends GetxController {
         horario: 'Martes a Domingo · 10:00 AM – 6:00 PM',
         servicios: ['Exposiciones'],
         reglas: ['No tocar'],
-        galeria: ['assets/multimedia/vr_1.png'],
+        galeria: [
+          'acervo/imagen1.jpeg',
+          "acervo/imagen2.jpeg",
+          "acervo/imagen3.jpeg",
+          "acervo/imagen4.jpeg",
+        ],
       ),
       Area(
         nombre: 'Cubiculos',
@@ -107,7 +121,18 @@ class HomeController extends GetxController {
         horario: 'Martes a Domingo · 10:00 AM – 6:00 PM',
         servicios: ['Exposiciones'],
         reglas: ['No tocar'],
-        galeria: ['assets/multimedia/vr_1.png'],
+        galeria: ['cubiculos/imagen1.jpeg', "cubiculos/imagen2.jpeg"],
+      ),
+      Area(
+        nombre: 'MEZZANINE',
+        x: 820,
+        y: 340,
+        categoria: 'Estudio',
+        descripcion: 'Patrimonio histórico de Nuevo León.',
+        horario: 'Martes a Domingo · 10:00 AM – 6:00 PM',
+        servicios: ['Exposiciones'],
+        reglas: ['No tocar'],
+        galeria: ['mezzanine/imagen1.jpeg', "mezzanine/imagen2.jpeg"],
       ),
     ],
     2: [
@@ -132,7 +157,12 @@ class HomeController extends GetxController {
         horario: '9:00 AM – 8:00 PM',
         servicios: ['Mesas'],
         reglas: ['Silencio'],
-        galeria: ['assets/multimedia/vr_1.png'],
+        galeria: [
+          'salaJuvenil/imagen1.jpeg',
+          'salaJuvenil/imagen2.jpeg',
+          'salaJuvenil/imagen3.jpeg',
+          'salaJuvenil/imagen4.jpeg',
+        ],
       ),
       Area(
         nombre: 'Auditorio',
@@ -143,7 +173,12 @@ class HomeController extends GetxController {
         horario: '9:00 AM – 8:00 PM',
         servicios: ['Escenario', 'Sonido'],
         reglas: ['No alimentos'],
-        galeria: ['assets/multimedia/vr_1.png'],
+        galeria: [
+          'auditorio/imagen1.jpeg',
+          'auditorio/imagen2.jpeg',
+          'auditorio/imagen3.jpeg',
+          'auditorio/imagen4.jpeg',
+        ],
         sePuedeRentar: true,
         infoRenta: 'Solicitar vía correo con 2 semanas de anticipación.',
       ),
@@ -156,7 +191,7 @@ class HomeController extends GetxController {
         horario: '9:00 AM – 8:00 PM',
         servicios: ['Lectura'],
         reglas: ['Cuidar materiales'],
-        galeria: ['assets/multimedia/vr_1.png'],
+        galeria: ['comicteca/imagen1.jpeg', 'comicteca/imagen2.jpeg'],
       ),
       Area(
         nombre: 'Primera infancia',
@@ -167,7 +202,11 @@ class HomeController extends GetxController {
         horario: '9:00 AM – 8:00 PM',
         servicios: ['Juegos didácticos'],
         reglas: ['Supervisión adultos'],
-        galeria: ['assets/multimedia/vr_1.png'],
+        galeria: [
+          'primeraInfancia/imagen1.jpeg',
+          'primeraInfancia/imagen2.jpeg',
+          'primeraInfancia/imagen3.jpeg',
+        ],
       ),
       Area(
         nombre: 'Cine infantil/Coliseo',
@@ -178,7 +217,12 @@ class HomeController extends GetxController {
         horario: '9:00 AM – 8:00 PM',
         servicios: ['Cine'],
         reglas: ['Orden'],
-        galeria: ['assets/multimedia/vr_1.png'],
+        galeria: [
+          'cineInfantil/imagen1.jpeg',
+          'cineInfantil/imagen2.jpeg',
+          'cineInfantil/imagen3.jpeg',
+          'cineInfantil/imagen4.jpeg',
+        ],
       ),
       Area(
         nombre: 'Ludoteca',
@@ -189,7 +233,12 @@ class HomeController extends GetxController {
         horario: '9:00 AM – 8:00 PM',
         servicios: ['Juguetes'],
         reglas: ['Compartir'],
-        galeria: ['assets/multimedia/vr_1.png'],
+        galeria: [
+          'ludoteca/imagen1.jpeg',
+          'ludoteca/imagen2.jpeg',
+          'ludoteca/imagen3.jpeg',
+          'ludoteca/imagen4.jpeg',
+        ],
       ),
       Area(
         nombre: 'Zona multimedia',
@@ -200,7 +249,11 @@ class HomeController extends GetxController {
         horario: '9:00 AM – 8:00 PM',
         servicios: ['Internet'],
         reglas: ['Tiempo limitado'],
-        galeria: ['assets/multimedia/vr_1.png'],
+        galeria: [
+          'multimedia/imagen1.jpeg',
+          'multimedia/imagen2.jpeg',
+          "multimedia/imagen3.jpeg",
+        ],
       ),
       Area(
         nombre: 'Realidad virtual',
@@ -211,7 +264,10 @@ class HomeController extends GetxController {
         horario: '9:00 AM – 8:00 PM',
         servicios: ['Gafas VR'],
         reglas: ['Uso responsable'],
-        galeria: ['assets/multimedia/vr_1.png'],
+        galeria: [
+          'realidadVirtual/imagen1.jpeg',
+          'realidadVirtual/imagen2.jpeg',
+        ],
       ),
       Area(
         nombre: 'Impresión 3D',
@@ -233,7 +289,11 @@ class HomeController extends GetxController {
         horario: '9:00 AM – 8:00 PM',
         servicios: ['Grabación'],
         reglas: ['Reservación'],
-        galeria: ['assets/multimedia/vr_1.png'],
+        galeria: [
+          'podcast/imagen1.jpeg',
+          'podcast/imagen2.jpeg',
+          'podcast/imagen3.jpeg',
+        ],
         sePuedeRentar: true,
       ),
     ],
@@ -246,13 +306,17 @@ class HomeController extends GetxController {
     // 🔹 SINCRONIZACIÓN TOUCH/GESTOS -> zoomLevel
     transformationController.addListener(() {
       final double scale = transformationController.value.getMaxScaleOnAxis();
-      
+
       // Mapeamos la escala física al rango de zoomLevel (-5 a 5)
       // Ajustado para que scale 2.5 sea nivel 5 y scale 0.4 sea nivel -5
       if (scale > 1.0) {
-        zoomLevel.value = ((scale - 1.0) / (2.5 - 1.0) * maxZoomClicks).round().clamp(0, maxZoomClicks);
+        zoomLevel.value = ((scale - 1.0) / (2.5 - 1.0) * maxZoomClicks)
+            .round()
+            .clamp(0, maxZoomClicks);
       } else if (scale < 1.0) {
-        zoomLevel.value = -((1.0 - scale) / (1.0 - 0.4) * maxZoomClicks).round().clamp(0, maxZoomClicks);
+        zoomLevel.value = -((1.0 - scale) / (1.0 - 0.4) * maxZoomClicks)
+            .round()
+            .clamp(0, maxZoomClicks);
       } else {
         zoomLevel.value = 0;
       }
@@ -358,7 +422,7 @@ class HomeController extends GetxController {
     transformationController.value = Matrix4.identity()
       ..translate(x, y)
       ..scale(zoomScale);
-    
+
     // Al centrar automáticamente, el listener actualizará el zoomLevel
   }
 
@@ -392,6 +456,8 @@ class HomeController extends GetxController {
   }
 
   void setCategoria(String cat) {
-    categoriaSeleccionada.value = (categoriaSeleccionada.value == cat) ? '' : cat;
+    categoriaSeleccionada.value = (categoriaSeleccionada.value == cat)
+        ? ''
+        : cat;
   }
 }
