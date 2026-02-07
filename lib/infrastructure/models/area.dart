@@ -7,11 +7,13 @@ class Area {
   final List<String> servicios;
   final List<String> reglas;
   final List<String> galeria;
+  final List<String> palabrasClave; // 🔹 NUEVO
+
   final bool? sePuedeRentar;
   final String? infoRenta;
   final int? piso;
   final String categoria;
-  final bool esUbicacionActual; // 🔹 NUEVO: Para identificar el punto "Usted está aquí"
+  final bool esUbicacionActual; // 🔹 Punto "Usted está aquí"
 
   Area({
     required this.nombre,
@@ -23,17 +25,19 @@ class Area {
     required this.reglas,
     required this.galeria,
     required this.categoria,
-    this.esUbicacionActual = false, // 🔹 Valor por defecto: no es ubicación
+    required this.palabrasClave, // 🔹 requerido
+    this.esUbicacionActual = false,
     this.sePuedeRentar,
     this.infoRenta,
     this.piso,
   });
 
-  /// 🔹 ACTUALIZADO CON CATEGORIA Y UBICACIÓN
+  /// 🔹 ACTUALIZADO CON PALABRAS CLAVE
   Area copyWith({
     int? piso,
     String? categoria,
     bool? esUbicacionActual,
+    List<String>? palabrasClave,
   }) {
     return Area(
       nombre: nombre,
@@ -49,6 +53,7 @@ class Area {
       categoria: categoria ?? this.categoria,
       piso: piso ?? this.piso,
       esUbicacionActual: esUbicacionActual ?? this.esUbicacionActual,
+      palabrasClave: palabrasClave ?? this.palabrasClave,
     );
   }
 }
