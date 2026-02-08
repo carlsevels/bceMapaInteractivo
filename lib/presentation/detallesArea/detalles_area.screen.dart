@@ -578,6 +578,7 @@ class _GaleriaAvanzadaScreenState extends State<GaleriaAvanzadaScreen> {
   @override
   Widget build(BuildContext context) {
     final bool isMobile = MediaQuery.of(context).size.width < 600;
+    final size = MediaQuery.of(context).size;
 
     return Scaffold(
       backgroundColor: Colors.black,
@@ -618,7 +619,7 @@ class _GaleriaAvanzadaScreenState extends State<GaleriaAvanzadaScreen> {
       ),
       body: Stack(
         children: [
-          isMobile ? _buildMobileView() : _buildDesktopView(),
+          isMobile ? _buildMobileView(size) : _buildDesktopView(size),
           Positioned(
             top: 0,
             left: 0,
@@ -642,7 +643,7 @@ class _GaleriaAvanzadaScreenState extends State<GaleriaAvanzadaScreen> {
   }
 
   // --- VISTA MÓVIL (Facebook style) ---
-  Widget _buildMobileView() {
+  Widget _buildMobileView(Size size) {
     return GestureDetector(
       onVerticalDragEnd: (details) {
         if (details.primaryVelocity! > 500) Navigator.pop(context);
@@ -653,6 +654,8 @@ class _GaleriaAvanzadaScreenState extends State<GaleriaAvanzadaScreen> {
         physics: const BouncingScrollPhysics(),
         itemBuilder: (context, index) {
           return InteractiveViewer(
+            panEnabled: true,    // permite arrastrar la imagen
+            scaleEnabled: true,  // habilita zoom
             minScale: 1.0,
             maxScale: 4.0,
             child: Center(
@@ -670,84 +673,84 @@ class _GaleriaAvanzadaScreenState extends State<GaleriaAvanzadaScreen> {
       ),
     );
   }
-Widget _buildDesktopView() {
-  final size = MediaQuery.of(context).size;
 
-  return Stack(
-    children: [
-      // --- Fondo desenfocado ---
-      AnimatedSwitcher(
-        duration: const Duration(milliseconds: 500),
-        child: Container(
-          key: ValueKey(widget.imagenes[_currentIndex]),
-          width: size.width,
-          height: size.height,
-          decoration: BoxDecoration(
-            image: DecorationImage(
-              image: AssetImage(widget.imagenes[_currentIndex]),
-              fit: BoxFit.cover,
+  // --- VISTA DESKTOP ---
+  Widget _buildDesktopView(Size size) {
+    return Stack(
+      children: [
+        // Fondo desenfocado
+        AnimatedSwitcher(
+          duration: const Duration(milliseconds: 500),
+          child: Container(
+            key: ValueKey(widget.imagenes[_currentIndex]),
+            width: size.width,
+            height: size.height,
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage(widget.imagenes[_currentIndex]),
+                fit: BoxFit.cover,
+              ),
+            ),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 40, sigmaY: 40),
+              child: Container(color: Colors.black.withOpacity(0.5)),
             ),
           ),
-          child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 40, sigmaY: 40),
-            child: Container(color: Colors.black.withOpacity(0.5)),
-          ),
         ),
-      ),
 
-      // --- Carrusel con soporte swipe y zoom ---
-      Center(
-        child: SizedBox(
-          height: size.height * 0.85,
-          child: PageView.builder(
-            controller: _pageController,
-            onPageChanged: (index) => setState(() => _currentIndex = index),
-            itemCount: widget.imagenes.length,
-            itemBuilder: (context, index) {
-              double diff = (index - _currentPageValue);
-              double baseScale = (1 - (diff.abs() * 0.25)).clamp(0.75, 1.0);
-              double opacity = (1 - (diff.abs() * 0.5)).clamp(0.3, 1.0);
+        // Carrusel con soporte swipe y zoom
+        Center(
+          child: SizedBox(
+            height: size.height * 0.85,
+            child: PageView.builder(
+              controller: _pageController,
+              onPageChanged: (index) => setState(() => _currentIndex = index),
+              itemCount: widget.imagenes.length,
+              itemBuilder: (context, index) {
+                double diff = (index - _currentPageValue);
+                double baseScale = (1 - (diff.abs() * 0.25)).clamp(0.75, 1.0);
+                double opacity = (1 - (diff.abs() * 0.5)).clamp(0.3, 1.0);
 
-              return Center(
-                child: Transform.scale(
-                  scale: baseScale,
-                  child: Opacity(
-                    opacity: opacity,
-                    child: Container(
-                      margin: const EdgeInsets.symmetric(horizontal: 15),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(25),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.25),
-                            blurRadius: 20,
-                            offset: const Offset(0, 10),
-                          ),
-                        ],
-                      ),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(25),
-                        child: InteractiveViewer(
-                          panEnabled: true,
-                          scaleEnabled: true, // <-- Habilita zoom
-                          minScale: 1.0,
-                          maxScale: 4.0,
-                          child: Image.asset(
-                            widget.imagenes[index],
-                            fit: BoxFit.contain,
-                            height: size.height * 0.85,
+                return Center(
+                  child: Transform.scale(
+                    scale: baseScale,
+                    child: Opacity(
+                      opacity: opacity,
+                      child: Container(
+                        margin: const EdgeInsets.symmetric(horizontal: 15),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(25),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.25),
+                              blurRadius: 20,
+                              offset: const Offset(0, 10),
+                            ),
+                          ],
+                        ),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(25),
+                          child: InteractiveViewer(
+                            panEnabled: true,
+                            scaleEnabled: true,
+                            minScale: 1.0,
+                            maxScale: 4.0,
+                            child: Image.asset(
+                              widget.imagenes[index],
+                              fit: BoxFit.contain,
+                              height: size.height * 0.85,
+                            ),
                           ),
                         ),
                       ),
                     ),
                   ),
-                ),
-              );
-            },
+                );
+              },
+            ),
           ),
         ),
-      ),
-    ],
-  );
-}
+      ],
+    );
+  }
 }

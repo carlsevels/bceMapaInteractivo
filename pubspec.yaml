@@ -22,5 +22,23 @@ dev_dependencies:
 flutter: 
   assets:
     - assets/
+    - assets/modulo/
+    - assets/inclusion/
+    - assets/multiproposito/
+    - assets/salaDeJuntas/
+    - assets/legadoNL/
+    - assets/acervo/
+    - assets/cubiculos/
+    - assets/mezzanine/
+    - assets/salaJuvenil/
+    - assets/auditorio/
+    - assets/comicteca/
+    - assets/primeraInfancia/
+    - assets/cineInfantil/
+    - assets/ludoteca/
+    - assets/multimedia/
+    - assets/realidadVirtual/
+    - assets/podcast/
+    - assets/logos/
   uses-material-design: true
 

@@ -15,136 +15,140 @@ class HomeScreen extends GetView<HomeController> {
     final bool isMobile = MediaQuery.of(context).size.width < 600;
 
     return Scaffold(
+      extendBodyBehindAppBar: true,
       backgroundColor: const Color(0xFFF5F7FA),
-      body: Stack(
-        children: [
-          Obx(
-            () => AnimatedPadding(
-              duration: const Duration(milliseconds: 50),
-              curve: Curves.easeOut,
-              padding: EdgeInsets.only(
-                left: controller.menuWidth.value,
-                right: 0,
-              ),
-              child: Stack(
-                children: [
-                  MapaPiso(
-                    key: ValueKey(controller.pisoActual.value),
-                    image: 'assets/piso_${controller.pisoActual.value}.png',
-                    areas: controller.pisos[controller.pisoActual.value] ?? [],
-                    currentQuery: controller.query.value,
-                    selectedCategory: controller.categoriaSeleccionada.value,
-                    missionStep: controller.missionStep.value,
-                    onAreaTap: controller.onAreaSelected,
-                    transformationController:
-                        controller.transformationController,
-                    paddingRight: controller.isPanelOpen.value ? 495 : 60,
-                    paddingTop: 150,
-                  ),
-                  _buildCategoryFilterBar(),
-                  _buildFloatingFloorIndicator(),
-                  _buildFloatingMenuButton(),
-                ],
-              ),
-            ),
-          ),
-
-          Obx(
-            () => AnimatedPositioned(
-              duration: const Duration(milliseconds: 600),
-              curve: Curves.easeOutQuart,
-              right: controller.isPanelOpen.value ? 465 : 20,
-              bottom: isMobile ? 100 : 20,
-              child: _buildZoomControls(),
-            ),
-          ),
-
-          _buildSideNavigation(context),
-
-          Obx(() {
-            final isOpen = controller.isPanelOpen.value;
-            final area = controller.visibleArea.value;
-            if (area == null) return const SizedBox.shrink();
-
-            if (isMobile) {
-              // Si es móvil y el panel debería estar abierto, disparamos el BottomSheet
-              if (isOpen) {
-                Future.microtask(() {
-                  Get.bottomSheet(
-                    // Contenedor de pantalla completa
-                    Container(
-                      height: Get.height,
-                      decoration: const BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.vertical(
-                          top: Radius.circular(30),
-                        ),
-                      ),
-                      child: DetallesAreaScreen(area: area),
+      body: SafeArea(
+        child: Stack(
+          children: [
+            Obx(
+              () => AnimatedPadding(
+                duration: const Duration(milliseconds: 50),
+                curve: Curves.easeOut,
+                padding: EdgeInsets.only(
+                  left: controller.menuWidth.value,
+                  right: 0,
+                ),
+                child: Stack(
+                  children: [
+                    MapaPiso(
+                      key: ValueKey(controller.pisoActual.value),
+                      image: 'assets/piso_${controller.pisoActual.value}.png',
+                      areas:
+                          controller.pisos[controller.pisoActual.value] ?? [],
+                      currentQuery: controller.query.value,
+                      selectedCategory: controller.categoriaSeleccionada.value,
+                      missionStep: controller.missionStep.value,
+                      onAreaTap: controller.onAreaSelected,
+                      transformationController:
+                          controller.transformationController,
+                      paddingRight: controller.isPanelOpen.value ? 495 : 60,
+                      paddingTop: 150,
                     ),
-                    isScrollControlled: true, // Permite pantalla completa
-                    ignoreSafeArea: false,
-                    enableDrag: true,
-                  ).then((_) {
-                    // Al cerrar el BottomSheet, sincronizamos el estado del controlador
-                    controller.isPanelOpen.value = false;
-                    controller.visibleArea.value = null;
-                  });
-                });
-              }
-              return const SizedBox.shrink();
-            }
+                    _buildCategoryFilterBar(isMobile),
+                    _buildFloatingFloorIndicator(isMobile),
+                    _buildFloatingMenuButton(),
+                  ],
+                ),
+              ),
+            ),
 
-            // Mantenemos tu diseño original para Desktop/Web
-            return AnimatedPositioned(
-              duration: const Duration(milliseconds: 600),
-              curve: Curves.easeOutQuart,
-              right: isOpen ? 25 : -500,
-              top: 25,
-              bottom: 25,
-              width: 420,
-              child: GestureDetector(
-                onPanUpdate: (details) {
-                  final tc = controller.transformationController;
-                  final matrix = tc.value.clone();
-                  final scale = matrix.getMaxScaleOnAxis();
+            Obx(
+              () => AnimatedPositioned(
+                duration: const Duration(milliseconds: 600),
+                curve: Curves.easeOutQuart,
+                right: controller.isPanelOpen.value ? 465 : 20,
+                bottom: isMobile ? 100 : 20,
+                child: _buildZoomControls(),
+              ),
+            ),
 
-                  matrix.translate(
-                    details.delta.dx / scale,
-                    details.delta.dy / scale,
-                  );
+            _buildSideNavigation(context),
 
-                  tc.value = matrix;
-                },
-                behavior: HitTestBehavior.translucent,
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.75),
-                    borderRadius: BorderRadius.circular(40),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.12),
-                        blurRadius: 35,
-                        spreadRadius: 5,
-                        offset: const Offset(-5, 0),
+            Obx(() {
+              final isOpen = controller.isPanelOpen.value;
+              final area = controller.visibleArea.value;
+              if (area == null) return const SizedBox.shrink();
+
+              if (isMobile) {
+                // Si es móvil y el panel debería estar abierto, disparamos el BottomSheet
+                if (isOpen) {
+                  Future.microtask(() {
+                    Get.bottomSheet(
+                      // Contenedor de pantalla completa
+                      Container(
+                        height: Get.height,
+                        decoration: const BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.vertical(
+                            top: Radius.circular(30),
+                          ),
+                        ),
+                        child: DetallesAreaScreen(area: area),
                       ),
-                    ],
-                  ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(40),
-                    child: BackdropFilter(
-                      filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
-                      child: DetallesAreaScreen(area: area),
+                      isScrollControlled: true, // Permite pantalla completa
+                      ignoreSafeArea: false,
+                      enableDrag: true,
+                    ).then((_) {
+                      // Al cerrar el BottomSheet, sincronizamos el estado del controlador
+                      controller.isPanelOpen.value = false;
+                      controller.visibleArea.value = null;
+                    });
+                  });
+                }
+                return const SizedBox.shrink();
+              }
+
+              // Mantenemos tu diseño original para Desktop/Web
+              return AnimatedPositioned(
+                duration: const Duration(milliseconds: 600),
+                curve: Curves.easeOutQuart,
+                right: isOpen ? 25 : -500,
+                top: 25,
+                bottom: 25,
+                width: 420,
+                child: GestureDetector(
+                  onPanUpdate: (details) {
+                    final tc = controller.transformationController;
+                    final matrix = tc.value.clone();
+                    final scale = matrix.getMaxScaleOnAxis();
+
+                    matrix.translate(
+                      details.delta.dx / scale,
+                      details.delta.dy / scale,
+                    );
+
+                    tc.value = matrix;
+                  },
+                  behavior: HitTestBehavior.translucent,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.75),
+                      borderRadius: BorderRadius.circular(40),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.12),
+                          blurRadius: 35,
+                          spreadRadius: 5,
+                          offset: const Offset(-5, 0),
+                        ),
+                      ],
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(40),
+                      child: BackdropFilter(
+                        filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
+                        child: DetallesAreaScreen(area: area),
+                      ),
                     ),
                   ),
                 ),
-              ),
-            );
-          }),
+              );
+            }),
 
-          /// --- 5. BANNER DE MISIÓN ---
-          _buildMissionBanner(),
-        ],
+            /// --- 5. BANNER DE MISIÓN ---
+            _buildMissionBanner(),
+          ],
+        ),
       ),
     );
   }
@@ -722,32 +726,7 @@ class HomeScreen extends GetView<HomeController> {
     });
   }
 
-  Widget _buildHelpButton() {
-    return InkWell(
-      onTap: () => controller.iniciarTutorial(),
-      borderRadius: BorderRadius.circular(18),
-      child: Container(
-        width: double.infinity,
-        padding: const EdgeInsets.symmetric(vertical: 18),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(18),
-          border: Border.all(color: Colors.white.withOpacity(0.5), width: 1.5),
-        ),
-        child: const Center(
-          child: Text(
-            'AYUDA / TUTORIAL',
-            style: TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.w800,
-              letterSpacing: 1,
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildCategoryFilterBar() {
+  Widget _buildCategoryFilterBar(isMobile) {
     final categorias = [
       "Información",
       "Cultura",
@@ -756,7 +735,7 @@ class HomeScreen extends GetView<HomeController> {
       "Inclusión",
     ];
     return Positioned(
-      top: 85,
+      top: isMobile ? 70 : 60,
       left: 0,
       right: 0,
       child: SingleChildScrollView(
@@ -793,31 +772,42 @@ class HomeScreen extends GetView<HomeController> {
     );
   }
 
-  Widget _buildFloatingFloorIndicator() => Positioned(
-    top: 25,
-    left: 20,
-    child: ClipRRect(
-      borderRadius: BorderRadius.circular(16),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-          decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.85),
+  Widget _buildFloatingFloorIndicator(isMobil) => Padding(
+    padding: const EdgeInsets.only(left: 20, right: 20, top: 8),
+    child: Positioned(
+      child: Row(
+        mainAxisAlignment: isMobil ? MainAxisAlignment.spaceBetween :  MainAxisAlignment.start,
+        children: [
+          isMobil ? 
+          SizedBox(width: 50, child: Image.asset("assets/logos/bce2.png")) : SizedBox.shrink(),
+          ClipRRect(
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: Colors.white.withOpacity(0.2)),
-          ),
-          child: Obx(
-            () => Text(
-              "PISO ${controller.pisoActual.value}",
-              style: TextStyle(
-                fontWeight: FontWeight.w900,
-                color: Colors.cyan[900],
-                letterSpacing: 1,
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 10,
+                ),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.85),
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: Colors.white.withOpacity(0.2)),
+                ),
+                child: Obx(
+                  () => Text(
+                    "PISO ${controller.pisoActual.value}",
+                    style: TextStyle(
+                      fontWeight: FontWeight.w900,
+                      color: Colors.cyan[900],
+                      letterSpacing: 1,
+                    ),
+                  ),
+                ),
               ),
             ),
           ),
-        ),
+        ],
       ),
     ),
   );
