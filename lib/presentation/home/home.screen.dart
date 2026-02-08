@@ -17,13 +17,12 @@ class HomeScreen extends GetView<HomeController> {
       body: Stack(
         children: [
           /// --- 1. CAPA DEL MAPA (FONDO) ---
-          /// Usamos AnimatedPadding para desplazar el mapa completo cuando el menú abre
           Obx(
             () => AnimatedPadding(
-              duration: const Duration(milliseconds: 500),
-              curve: Curves.fastOutSlowIn,
+              duration: const Duration(milliseconds: 50),
+              curve: Curves.easeOut,
               padding: EdgeInsets.only(
-                left: controller.isMenuOpen.value ? 350 : 0,
+                left: controller.menuWidth.value,
                 right: 0,
               ),
               child: Stack(
@@ -52,7 +51,6 @@ class HomeScreen extends GetView<HomeController> {
           ),
 
           /// --- 2. CONTROLES DE ZOOM ---
-          /// Se mueven a la izquierda para no quedar bajo el panel de detalles
           Obx(
             () => AnimatedPositioned(
               duration: const Duration(milliseconds: 600),
@@ -64,18 +62,7 @@ class HomeScreen extends GetView<HomeController> {
           ),
 
           /// --- 3. MENÚ LATERAL IZQUIERDO (SIDE NAV) ---
-          /// Este es el que mide 350 y se esconde/muestra
-          Obx(
-            () => AnimatedPositioned(
-              duration: const Duration(milliseconds: 500),
-              curve: Curves.fastOutSlowIn,
-              left: controller.isMenuOpen.value ? 0 : -350,
-              top: 0,
-              bottom: 0,
-              width: 350,
-              child: _buildSideNavigation(),
-            ),
-          ),
+          _buildSideNavigation(context),
 
           /// --- 4. PANEL DE DETALLES (DERECHA) ---
           Obx(() {
@@ -91,43 +78,43 @@ class HomeScreen extends GetView<HomeController> {
               top: 25,
               bottom: 25,
               width: 420,
-              child:  GestureDetector(
-  // Este onPanUpdate mueve el mapa en tiempo real, incluso si arrastras desde el panel
-  onPanUpdate: (details) {
-    final tc = controller.transformationController;
-    final matrix = tc.value.clone(); // clonamos la matriz para no romperla
-    final scale = matrix.getMaxScaleOnAxis();
+              child: GestureDetector(
+                onPanUpdate: (details) {
+                  final tc = controller.transformationController;
+                  final matrix = tc.value.clone();
+                  final scale = matrix.getMaxScaleOnAxis();
 
-    // Movemos la matriz proporcional al delta del arrastre
-    matrix.translate(details.delta.dx / scale, details.delta.dy / scale);
+                  matrix.translate(
+                    details.delta.dx / scale,
+                    details.delta.dy / scale,
+                  );
 
-    // Actualizamos el transformationController para que el mapa se mueva inmediatamente
-    tc.value = matrix;
-  },
-  behavior: HitTestBehavior.translucent, // Esto asegura que el detector capture arrastre incluso en áreas transparentes
-  child: Container(
-    decoration: BoxDecoration(
-      color: Colors.white.withOpacity(0.75),
-      borderRadius: BorderRadius.circular(40),
-      boxShadow: [
-        BoxShadow(
-          color: Colors.black.withOpacity(0.12),
-          blurRadius: 35,
-          spreadRadius: 5,
-          offset: const Offset(-5, 0),
-        ),
-      ],
-    ),
-    child: ClipRRect(
-      borderRadius: BorderRadius.circular(40),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
-        child: DetallesAreaScreen(area: area),
-      ),
-    ),
-  ),
-),
-    );
+                  tc.value = matrix;
+                },
+                behavior: HitTestBehavior.translucent,
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.75),
+                    borderRadius: BorderRadius.circular(40),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.12),
+                        blurRadius: 35,
+                        spreadRadius: 5,
+                        offset: const Offset(-5, 0),
+                      ),
+                    ],
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(40),
+                    child: BackdropFilter(
+                      filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
+                      child: DetallesAreaScreen(area: area),
+                    ),
+                  ),
+                ),
+              ),
+            );
           }),
 
           /// --- 5. BANNER DE MISIÓN ---
@@ -136,11 +123,9 @@ class HomeScreen extends GetView<HomeController> {
       ),
     );
   }
-  // --- TODOS TUS MÉTODOS ORIGINALES SIN CAMBIOS ---
 
   Widget _buildZoomControls() {
     return Column(
-      // Quitamos el Positioned interno porque ya está en AnimatedPositioned
       children: [
         Obx(
           () => miniFab(
@@ -165,124 +150,292 @@ class HomeScreen extends GetView<HomeController> {
     );
   }
 
-  Widget _buildSideNavigation() {
-    return Container(
-      width: 320,
-      decoration: const BoxDecoration(color: Colors.cyan),
-      padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 30),
-      child: SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Center(
-                child: Column(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(14),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.15),
-                        borderRadius: BorderRadius.circular(22),
-                      ),
-                      child: Image.asset("logos/bce2.png", width: 110),
-                    ),
-                    const SizedBox(height: 8),
-                    const Text(
-                      "BCE",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 20,
-                        fontWeight: FontWeight.w800,
-                        letterSpacing: 3,
-                      ),
-                    ),
-                    const SizedBox(height: 6),
-                    const Text(
-                      "Biblioteca Central de Estado",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: Colors.white70,
-                        fontSize: 11,
-                        fontWeight: FontWeight.w600,
-                        letterSpacing: 1.2,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    const Text(
-                      "Fray Servando Teresa de Mier",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: Colors.white54,
-                        fontSize: 10,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ],
+  Widget _buildSideNavigation(BuildContext context) {
+    return Obx(() {
+      double currentWidth = controller.menuWidth.value;
+      bool isMini = currentWidth < 160;
+      bool isClosed = currentWidth < 10;
+
+      return Stack(
+        children: [
+          AnimatedContainer(
+            duration: Duration(
+              milliseconds: controller.isDragging.value ? 0 : 250,
+            ),
+            curve: Curves.easeInOut,
+            width: currentWidth,
+            height: double.infinity,
+            decoration: const BoxDecoration(
+              color: Colors.cyan,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black12,
+                  blurRadius: 10,
+                  spreadRadius: 2,
                 ),
-              ),
-              const SizedBox(height: 16),
-              Obx(
-                () => _tutorialHighlight(
-                  isActive: controller.missionStep.value == 2,
-                  child: Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.12),
-                      borderRadius: BorderRadius.circular(18),
+              ],
+            ),
+            clipBehavior: Clip.hardEdge,
+            child: Stack(
+              children: [
+                SafeArea(
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: isMini ? 8 : 22,
+                      vertical: 50,
                     ),
-                    child: _buildSearchSection(),
+                    child: Column(
+                      crossAxisAlignment: isMini
+                          ? CrossAxisAlignment.center
+                          : CrossAxisAlignment.start,
+                      children: [
+                        Center(
+                          child: Container(
+                            padding: EdgeInsets.all(isMini ? 8 : 14),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.15),
+                              borderRadius: BorderRadius.circular(
+                                isMini ? 12 : 22,
+                              ),
+                            ),
+                            child: Image.asset(
+                              "logos/bce2.png",
+                              width: isMini ? 35 : 100,
+                            ),
+                          ),
+                        ),
+                        if (!isMini) ...[
+                          const SizedBox(height: 12),
+                          const Center(
+                            child: Text(
+                              "BCE",
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 18,
+                                fontWeight: FontWeight.w800,
+                                letterSpacing: 2,
+                              ),
+                            ),
+                          ),
+                        ],
+                        const SizedBox(height: 25),
+
+                        _tutorialHighlight(
+                          isActive: controller.missionStep.value == 2,
+                          child: isMini
+                              ? _buildMiniCircleButton(
+                                  Icons.search,
+                                  () => _showSearchDialog(),
+                                )
+                              : Container(
+                                  padding: const EdgeInsets.all(12),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white.withOpacity(0.12),
+                                    borderRadius: BorderRadius.circular(18),
+                                  ),
+                                  child: _buildSearchSection(),
+                                ),
+                        ),
+                        const SizedBox(height: 25),
+
+                        if (!isMini)
+                          const Text(
+                            'SELECCIONAR PISO',
+                            style: TextStyle(
+                              color: Colors.white70,
+                              fontSize: 11,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        const SizedBox(height: 10),
+
+                        Expanded(
+                          child: _tutorialHighlight(
+                            isActive: controller.missionStep.value == 1,
+                            child: _buildFloorList(isMini),
+                          ),
+                        ),
+                        Column(
+                          crossAxisAlignment: isMini
+                              ? CrossAxisAlignment.center
+                              : CrossAxisAlignment.start,
+                          children: [
+                            const SizedBox(height: 10),
+                            isMini
+                                ? _buildMiniCircleButton(
+                                    Icons.help_outline,
+                                    () => controller.iniciarTutorial(),
+                                  )
+                                : _buildHelpButton(),
+                          ],
+                        ),
+                        SizedBox(height: 16.0),
+                        Positioned(
+                          top: 10,
+                          right: 10,
+                          child: GestureDetector(
+                            onTap: () {
+                              controller.isDragging.value = false;
+                              controller.menuWidth.value = isMini ? 320 : 80;
+                            },
+                            child: Container(
+                              width: 32,
+                              height: 32,
+                              decoration: BoxDecoration(
+                                color: Colors.white.withOpacity(0.2),
+                                shape: BoxShape.circle,
+                              ),
+                              child: Icon(
+                                isMini
+                                    ? Icons.chevron_right
+                                    : Icons.chevron_left,
+                                color: Colors.white,
+                                size: 20,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-              ),
-              const SizedBox(height: 30),
-              Row(
-                children: const [
-                  Icon(Icons.layers_rounded, color: Colors.white70, size: 16),
-                  SizedBox(width: 8),
-                  Text(
-                    'Selecciona nivel',
-                    style: TextStyle(
-                      color: Colors.white70,
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 12),
-              Container(
-                height: 170,
-                child: Obx(
-                  () => _tutorialHighlight(
-                    isActive: controller.missionStep.value == 1,
-                    child: Container(
-                      padding: const EdgeInsets.all(14),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.10),
-                        borderRadius: BorderRadius.circular(18),
-                      ),
-                      child: _buildFloorList(),
-                    ),
+              ],
+            ),
+          ),
+        ],
+      );
+    });
+  }
+
+  // Widget auxiliar para botones modo mini
+  Widget _buildMiniCircleButton(IconData icon, VoidCallback onTap) {
+    return InkWell(
+      onTap: onTap,
+      child: Container(
+        width: 45,
+        height: 45,
+        decoration: BoxDecoration(
+          color: Colors.white.withOpacity(0.15),
+          shape: BoxShape.circle,
+        ),
+        child: Icon(icon, color: Colors.white, size: 20),
+      ),
+    );
+  }
+
+  // DIÁLOGO PARA BÚSQUEDA CENTRAL
+  void _showSearchDialog() {
+    Get.dialog(
+      Center(
+        child: Material(
+          color: Colors.transparent,
+          child: Container(
+            width: 400,
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: Colors.cyan[800],
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: const [
+                BoxShadow(color: Colors.black26, blurRadius: 20),
+              ],
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Text(
+                  "Buscador",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
-              ),
-              const SizedBox(height: 18),
-              Container(
-                padding: const EdgeInsets.symmetric(vertical: 8),
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.18),
-                  borderRadius: BorderRadius.circular(16),
+                const SizedBox(height: 20),
+                _buildSearchSection(),
+                const SizedBox(height: 10),
+                TextButton(
+                  onPressed: () => Get.back(),
+                  child: const Text(
+                    "Cerrar",
+                    style: TextStyle(color: Colors.white70),
+                  ),
                 ),
-                child: _buildHelpButton(),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
     );
   }
 
-  // --- MÉTODOS DE APOYO (INTACTOS) ---
+  // --- MODIFICADO PARA SOPORTAR P1 / PISO 1 ---
+  Widget _buildFloorList(bool isMini) {
+    return ListView(
+      padding: EdgeInsets.zero,
+      children: [2, 1].map((i) {
+        return Obx(() {
+          bool sel = controller.pisoActual.value == i;
+          return AnimatedContainer(
+            duration: const Duration(milliseconds: 300),
+            margin: const EdgeInsets.only(bottom: 12),
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: () {
+                  controller.pisoActual.value = i;
+                  controller.resetZoom();
+                },
+                borderRadius: BorderRadius.circular(18),
+                child: Container(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: isMini ? 5 : 20,
+                    vertical: 16,
+                  ),
+                  decoration: BoxDecoration(
+                    color: sel ? Colors.white : Colors.white.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(18),
+                    border: Border.all(
+                      color: sel ? Colors.white : Colors.white24,
+                      width: 1,
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: isMini
+                        ? MainAxisAlignment.center
+                        : MainAxisAlignment.start,
+                    children: [
+                      Icon(
+                        Icons.layers_outlined,
+                        color: sel ? Colors.orange : Colors.white,
+                        size: isMini ? 18 : 22,
+                      ),
+                      if (!isMini) const SizedBox(width: 15),
+                      Text(
+                        isMini ? "P$i" : "PISO $i",
+                        style: TextStyle(
+                          color: sel ? Colors.orange : Colors.white,
+                          fontWeight: FontWeight.w900,
+                          fontSize: isMini ? 12 : 16,
+                        ),
+                      ),
+                      if (!isMini && sel) ...[
+                        const Spacer(),
+                        const Icon(
+                          Icons.arrow_forward_ios,
+                          color: Colors.orange,
+                          size: 14,
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          );
+        });
+      }).toList(),
+    );
+  }
 
   Widget _tutorialHighlight({required bool isActive, required Widget child}) {
     return AnimatedContainer(
@@ -432,70 +585,6 @@ class HomeScreen extends GetView<HomeController> {
       ),
       TextSpan(text: text.substring(matchIndex + query.length)),
     ];
-  }
-
-  Widget _buildFloorList() {
-    return ListView(
-      padding: EdgeInsets.zero,
-      children: [2, 1].map((i) {
-        return Obx(() {
-          bool sel = controller.pisoActual.value == i;
-          return AnimatedContainer(
-            duration: const Duration(milliseconds: 300),
-            margin: const EdgeInsets.only(bottom: 12),
-            child: Material(
-              color: Colors.transparent,
-              child: InkWell(
-                onTap: () {
-                  controller.pisoActual.value = i;
-                  controller.resetZoom();
-                },
-                borderRadius: BorderRadius.circular(18),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: 16,
-                  ),
-                  decoration: BoxDecoration(
-                    color: sel ? Colors.white : Colors.white.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(18),
-                    border: Border.all(
-                      color: sel ? Colors.white : Colors.white24,
-                      width: 1,
-                    ),
-                  ),
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.layers_outlined,
-                        color: sel ? Colors.orange : Colors.white,
-                        size: 22,
-                      ),
-                      const SizedBox(width: 15),
-                      Text(
-                        "PISO $i",
-                        style: TextStyle(
-                          color: sel ? Colors.orange : Colors.white,
-                          fontWeight: FontWeight.w900,
-                          fontSize: 16,
-                        ),
-                      ),
-                      const Spacer(),
-                      if (sel)
-                        const Icon(
-                          Icons.arrow_forward_ios,
-                          color: Colors.orange,
-                          size: 14,
-                        ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          );
-        });
-      }).toList(),
-    );
   }
 
   Widget _buildMissionBanner() {
@@ -679,9 +768,18 @@ class HomeScreen extends GetView<HomeController> {
       bottom: 30,
       left: 30,
       child: Obx(() {
+        // Bloqueamos el botón si el tutorial está en pasos intermedios
         bool tutorialActivo =
             controller.missionStep.value > 0 &&
             controller.missionStep.value < 4;
+
+        double currentWidth = controller.menuWidth.value;
+
+        // Definimos los estados para el texto del botón
+        bool isFull = currentWidth > 200;
+        bool isMini = currentWidth >= 10 && currentWidth <= 200;
+        bool isClosed = currentWidth < 10;
+
         return Opacity(
           opacity: tutorialActivo ? 0.5 : 1.0,
           child: FloatingActionButton.extended(
@@ -693,18 +791,30 @@ class HomeScreen extends GetView<HomeController> {
             ),
             onPressed: tutorialActivo
                 ? null
-                : () => controller.isMenuOpen.toggle(),
+                : () {
+                    // Lógica de ciclo: Cerrado -> Completo -> Mini -> Cerrado
+                    if (isClosed) {
+                      controller.menuWidth.value = 320;
+                      controller.isMenuOpen.value = true;
+                    } else if (isFull) {
+                      controller.menuWidth.value = 80; // Cambia a modo P1/P2
+                      controller.isMenuOpen.value = true;
+                    } else {
+                      controller.menuWidth.value = 0; // Cierra completamente
+                      controller.isMenuOpen.value = false;
+                    }
+                  },
             label: Text(
-              controller.isMenuOpen.value ? "CERRAR" : "EXPLORAR",
+              isFull ? "MINIMIZAR" : (isMini ? "CERRAR" : "EXPLORAR"),
               style: TextStyle(
                 color: tutorialActivo ? Colors.grey : Colors.cyan[800],
                 fontWeight: FontWeight.bold,
               ),
             ),
             icon: Icon(
-              controller.isMenuOpen.value
-                  ? Icons.close
-                  : Icons.menu_open_rounded,
+              isClosed
+                  ? Icons.menu_open_rounded
+                  : (isFull ? Icons.unfold_less_rounded : Icons.close),
               color: tutorialActivo ? Colors.grey : Colors.cyan[800],
             ),
           ),

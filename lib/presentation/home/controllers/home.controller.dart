@@ -13,7 +13,8 @@ class HomeController extends GetxController {
   final RxString query = ''.obs;
   final RxList<Area> sugerencias = <Area>[].obs;
   final RxString categoriaSeleccionada = ''.obs;
-
+  var menuWidth = 320.0.obs; // ancho inicial
+  var isDragging = false.obs;
   // 🔹 CONTROL DE ZOOM
   final RxInt zoomLevel = 0.obs;
   final int maxZoomClicks = 5;
@@ -803,7 +804,7 @@ class HomeController extends GetxController {
     query.value = area.nombre;
     searchController.text = area.nombre;
     sugerencias.clear();
-
+      Get.back();
     _aplicarZoomAutomatico(area);
   }
 
@@ -822,7 +823,6 @@ class HomeController extends GetxController {
     transformationController.value = Matrix4.identity()
       ..translate(x, y)
       ..scale(zoomScale);
-
   }
 
   String normalize(String text) {
