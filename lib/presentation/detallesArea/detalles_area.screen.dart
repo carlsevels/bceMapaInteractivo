@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:mapa_interactivo/infrastructure/models/area.dart';
 import 'package:mapa_interactivo/presentation/home/controllers/home.controller.dart';
+import 'package:mapa_interactivo/presentation/home/localWidgets/createQR.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 
 class DetallesAreaScreen extends StatelessWidget {
   final Area? area;
@@ -356,7 +358,7 @@ class DetallesAreaScreen extends StatelessWidget {
             ),
             const SizedBox(height: 20),
             _buildContactTile(
-              icon: Icons.chat_bubble_rounded,
+              icon: Icons.phone,
               title: "WhatsApp",
               value: "928 383 8382",
               color: const Color(0xFF25D366),
@@ -366,8 +368,8 @@ class DetallesAreaScreen extends StatelessWidget {
             _buildContactTile(
               icon: Icons.alternate_email_rounded,
               title: "Correo Electrónico",
-              value: "correo@gob.com",
-              color: Colors.blueAccent,
+              value: "redestataldebibliotecasnl@gob.com",
+              color: Colors.orange,
               onTap: () => _mostrarDialogoQR('gmail.png', "Correo"),
             ),
             const SizedBox(height: 20),
@@ -407,45 +409,122 @@ class DetallesAreaScreen extends StatelessWidget {
     );
   }
 
-  void _mostrarDialogoQR(String qrPath, String titulo) {
-    Get.dialog(
-      Center(
-        child: Material(
-          color: Colors.transparent,
-          child: Container(
-            width: 320, // Ajustado para que quepa bien en el panel
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(24),
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  "Escanea para $titulo",
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
+void _mostrarDialogoQR(String qrPath, String titulo) {
+  final bool esWhatsApp = titulo == 'WhatsApp';
+
+  Get.dialog(
+    Center(
+      child: Material(
+        color: Colors.transparent,
+        child: Container(
+          width: 360,
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(28),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.15),
+                blurRadius: 20,
+                offset: const Offset(0, 10),
+              ),
+            ],
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // ---------- HEADER ----------
+              Row(
+                children: [
+                  CircleAvatar(
+                    radius: 22,
+                    backgroundColor: esWhatsApp
+                        ? const Color(0xFF25D366)
+                        : Colors.orange,
+                    child: Icon(
+                      esWhatsApp ? Icons.phone : Icons.email_rounded,
+                      color: Colors.white,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      'Escanea para $titulo',
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: () => Get.back(),
+                    icon: const Icon(Icons.close_rounded),
+                  ),
+                ],
+              ),
+
+              const SizedBox(height: 20),
+
+              // ---------- SUBTÍTULO ----------
+              Text(
+                esWhatsApp ? 'WHATSAPP' : 'CORREO ELECTRÓNICO',
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 1.2,
+                  color: esWhatsApp
+                      ? const Color(0xFF25D366)
+                      : Colors.orange,
+                ),
+              ),
+
+              const SizedBox(height: 16),
+
+              // ---------- QR CARD ----------
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade100,
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: esWhatsApp
+                    ? buildQrReservaWhatsApp(controller)
+                    : buildQrReservaFuncional(controller),
+              ),
+
+              const SizedBox(height: 24),
+
+              // ---------- BOTÓN ----------
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () => Get.back(),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: esWhatsApp
+                        ? const Color(0xFF25D366)
+                        : Colors.orange,
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(18),
+                    ),
+                    elevation: 0,
+                  ),
+                  child: const Text(
+                    'Cerrar',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
-                const SizedBox(height: 16),
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(12),
-                  child: Image.asset(qrPath, width: 200, height: 200),
-                ),
-                const SizedBox(height: 16),
-                ElevatedButton(
-                  onPressed: () => Get.back(),
-                  child: const Text("CERRAR"),
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 
   Widget _buildSectionLabel(String title) {
     return Text(

@@ -653,7 +653,7 @@ class HomeController extends GetxController {
       ),
 
       Area(
-        nombre: 'Cabina podcast',
+        nombre: 'Cabina de podcast',
         x: 480,
         y: 240,
         categoria: 'Tecnología',
@@ -766,6 +766,7 @@ class HomeController extends GetxController {
     isPanelOpen.value = false;
     categoriaSeleccionada.value = "";
     resetZoom();
+
     if (val.trim().isEmpty) {
       sugerencias.clear();
       return;
@@ -781,7 +782,7 @@ class HomeController extends GetxController {
         final nombreMatch = normalize(area.nombre).contains(normalizedQuery);
 
         final palabrasClaveMatch = area.palabrasClave.any(
-          (palabra) => normalize(palabra).contains(normalizedQuery),
+          (p) => normalize(p).contains(normalizedQuery),
         );
 
         if (nombreMatch || palabrasClaveMatch) {
@@ -804,11 +805,10 @@ class HomeController extends GetxController {
     sugerencias.clear();
 
     _aplicarZoomAutomatico(area);
-    //onAreaSelected(area);
   }
 
   void _aplicarZoomAutomatico(Area area) {
-    const double zoomScale = 2.5;
+    const double zoomScale = 1.5;
     final Size screenSize = Get.size;
 
     double centerX = screenSize.width / 2;
@@ -823,7 +823,6 @@ class HomeController extends GetxController {
       ..translate(x, y)
       ..scale(zoomScale);
 
-    // Al centrar automáticamente, el listener actualizará el zoomLevel
   }
 
   String normalize(String text) {
@@ -860,4 +859,11 @@ class HomeController extends GetxController {
         ? ''
         : cat;
   }
+}
+
+class _ResultadoBusqueda {
+  final Area area;
+  final int score;
+
+  _ResultadoBusqueda({required this.area, required this.score});
 }
