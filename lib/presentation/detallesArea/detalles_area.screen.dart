@@ -3,9 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:mapa_interactivo/infrastructure/models/area.dart';
 import 'package:mapa_interactivo/presentation/home/controllers/home.controller.dart';
-import 'package:mapa_interactivo/presentation/home/localWidgets/createQR.dart';
-import 'package:qr_flutter/qr_flutter.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class DetallesAreaScreen extends StatelessWidget {
   final Area? area;
@@ -20,7 +17,7 @@ class DetallesAreaScreen extends StatelessWidget {
     final Area? areaFinal = area ?? Get.arguments as Area?;
 
     if (areaFinal == null) return const SizedBox.shrink();
-
+    final bool isMobile = MediaQuery.of(context).size.width < 600;
     return Container(
       child: Stack(
         children: [
@@ -80,7 +77,7 @@ class DetallesAreaScreen extends StatelessWidget {
             right: 12,
             child: SafeArea(
               child: FloatingActionButton.small(
-                onPressed: controller.closePanel,
+                onPressed: isMobile ? Get.back : controller.closePanel,
                 backgroundColor: Colors.white.withOpacity(0.9),
                 child: const Icon(Icons.close, color: Colors.black87),
               ),
@@ -536,8 +533,6 @@ class DetallesAreaScreen extends StatelessWidget {
   }
 }
 
-// ---------------- GALERIA AVANZADA ----------------
-
 class GaleriaAvanzadaScreen extends StatefulWidget {
   final List<String> imagenes;
   final int initialIndex;
@@ -556,19 +551,22 @@ class GaleriaAvanzadaScreen extends StatefulWidget {
 
 class _GaleriaAvanzadaScreenState extends State<GaleriaAvanzadaScreen> {
   late PageController _pageController;
-  double _currentPage = 0;
+  late int _currentIndex;
+  double _currentPageValue = 0.0;
 
   @override
   void initState() {
     super.initState();
-    _currentPage = widget.initialIndex.toDouble();
-    _pageController = PageController(
-      initialPage: widget.initialIndex,
-      viewportFraction: 0.75,
-    );
-    _pageController.addListener(
-      () => setState(() => _currentPage = _pageController.page!),
-    );
+    _currentIndex = widget.initialIndex;
+    _currentPageValue = widget.initialIndex.toDouble();
+    _pageController = PageController(initialPage: widget.initialIndex);
+
+    _pageController.addListener(() {
+      setState(() {
+        _currentPageValue = _pageController.page!;
+        _currentIndex = _currentPageValue.round();
+      });
+    });
   }
 
   @override
@@ -579,151 +577,177 @@ class _GaleriaAvanzadaScreenState extends State<GaleriaAvanzadaScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final bool isMobile = MediaQuery.of(context).size.width < 600;
+
     return Scaffold(
       backgroundColor: Colors.black,
       extendBodyBehindAppBar: true,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        centerTitle: true,
-        title: Text(
-          widget.title.toUpperCase(),
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 13,
-            fontWeight: FontWeight.w900,
-            letterSpacing: 3.0,
-          ),
-        ),
         leading: IconButton(
           icon: const Icon(Icons.close, color: Colors.white, size: 28),
           onPressed: () => Navigator.pop(context),
         ),
+        centerTitle: true,
+        title: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              isMobile
+                  ? "${_currentIndex + 1} / ${widget.imagenes.length}"
+                  : widget.title.toUpperCase(),
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: isMobile ? 16 : 13,
+                fontWeight: isMobile ? FontWeight.w600 : FontWeight.w900,
+                letterSpacing: isMobile ? 0 : 3.0,
+              ),
+            ),
+            if (isMobile)
+              Text(
+                widget.title,
+                style: TextStyle(
+                  color: Colors.white.withOpacity(0.7),
+                  fontSize: 12,
+                  fontWeight: FontWeight.w400,
+                ),
+              ),
+          ],
+        ),
       ),
       body: Stack(
         children: [
-          AnimatedSwitcher(
-            duration: const Duration(milliseconds: 600),
-            child: Container(
-              key: ValueKey(widget.imagenes[_currentPage.round()]),
-              decoration: BoxDecoration(
-                image: DecorationImage(
-                  image: AssetImage(widget.imagenes[_currentPage.round()]),
-                  fit: BoxFit.cover,
-                ),
-              ),
-              child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 35, sigmaY: 35),
-                child: Container(color: Colors.black.withOpacity(0.6)),
-              ),
-            ),
-          ),
-          Center(
-            child: SizedBox(
-              height: MediaQuery.of(context).size.height,
-              child: PageView.builder(
-                controller: _pageController,
-                itemCount: widget.imagenes.length,
-                physics: const BouncingScrollPhysics(),
-                itemBuilder: (context, index) {
-                  double relativePosition = index - _currentPage;
-                  double scale = (1 - (relativePosition.abs() * 0.22)).clamp(
-                    0.75,
-                    1.0,
-                  );
-                  double rotation = (relativePosition * 0.15).clamp(
-                    -0.25,
-                    0.25,
-                  );
-
-                  return Center(
-                    child: Transform(
-                      transform: Matrix4.identity()
-                        ..setEntry(3, 2, 0.001)
-                        ..scale(scale)
-                        ..rotateY(rotation),
-                      alignment: Alignment.center,
-                      child: Container(
-                        margin: const EdgeInsets.symmetric(horizontal: 12),
-                        width: MediaQuery.of(context).size.width * 0.72,
-                        height: MediaQuery.of(context).size.width * 0.72,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(40),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.8),
-                              blurRadius: 30,
-                              offset: const Offset(0, 20),
-                              spreadRadius: -8,
-                            ),
-                          ],
-                        ),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(40),
-                          child: Stack(
-                            fit: StackFit.expand,
-                            children: [
-                              Hero(
-                                tag: 'img_$index',
-                                child: Image.asset(
-                                  widget.imagenes[index],
-                                  fit: BoxFit.cover,
-                                ),
-                              ),
-                              Positioned(
-                                top: 0,
-                                left: 0,
-                                right: 0,
-                                child: Container(
-                                  height: 100,
-                                  decoration: BoxDecoration(
-                                    gradient: LinearGradient(
-                                      begin: Alignment.topCenter,
-                                      end: Alignment.bottomCenter,
-                                      colors: [
-                                        Colors.black.withOpacity(0.7),
-                                        Colors.transparent,
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  );
-                },
-              ),
-            ),
-          ),
+          isMobile ? _buildMobileView() : _buildDesktopView(),
           Positioned(
-            bottom: 60,
+            top: 0,
             left: 0,
             right: 0,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: List.generate(widget.imagenes.length, (index) {
-                double isActive = (1 - (index - _currentPage).abs()).clamp(
-                  0.0,
-                  1.0,
-                );
-                return AnimatedContainer(
-                  duration: const Duration(milliseconds: 300),
-                  margin: const EdgeInsets.symmetric(horizontal: 4),
-                  width: 6 + (isActive * 12),
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.2 + (isActive * 0.8)),
-                    borderRadius: BorderRadius.circular(2),
+            child: IgnorePointer(
+              child: Container(
+                height: 120,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [Colors.black.withOpacity(0.7), Colors.transparent],
                   ),
-                );
-              }),
+                ),
+              ),
             ),
           ),
         ],
       ),
     );
   }
+
+  // --- VISTA MÓVIL (Facebook style) ---
+  Widget _buildMobileView() {
+    return GestureDetector(
+      onVerticalDragEnd: (details) {
+        if (details.primaryVelocity! > 500) Navigator.pop(context);
+      },
+      child: PageView.builder(
+        controller: _pageController,
+        itemCount: widget.imagenes.length,
+        physics: const BouncingScrollPhysics(),
+        itemBuilder: (context, index) {
+          return InteractiveViewer(
+            minScale: 1.0,
+            maxScale: 4.0,
+            child: Center(
+              child: Hero(
+                tag: 'img_$index',
+                child: Image.asset(
+                  widget.imagenes[index],
+                  fit: BoxFit.contain,
+                  width: double.infinity,
+                ),
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+Widget _buildDesktopView() {
+  final size = MediaQuery.of(context).size;
+
+  return Stack(
+    children: [
+      // --- Fondo desenfocado ---
+      AnimatedSwitcher(
+        duration: const Duration(milliseconds: 500),
+        child: Container(
+          key: ValueKey(widget.imagenes[_currentIndex]),
+          width: size.width,
+          height: size.height,
+          decoration: BoxDecoration(
+            image: DecorationImage(
+              image: AssetImage(widget.imagenes[_currentIndex]),
+              fit: BoxFit.cover,
+            ),
+          ),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 40, sigmaY: 40),
+            child: Container(color: Colors.black.withOpacity(0.5)),
+          ),
+        ),
+      ),
+
+      // --- Carrusel con soporte swipe y zoom ---
+      Center(
+        child: SizedBox(
+          height: size.height * 0.85,
+          child: PageView.builder(
+            controller: _pageController,
+            onPageChanged: (index) => setState(() => _currentIndex = index),
+            itemCount: widget.imagenes.length,
+            itemBuilder: (context, index) {
+              double diff = (index - _currentPageValue);
+              double baseScale = (1 - (diff.abs() * 0.25)).clamp(0.75, 1.0);
+              double opacity = (1 - (diff.abs() * 0.5)).clamp(0.3, 1.0);
+
+              return Center(
+                child: Transform.scale(
+                  scale: baseScale,
+                  child: Opacity(
+                    opacity: opacity,
+                    child: Container(
+                      margin: const EdgeInsets.symmetric(horizontal: 15),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(25),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.25),
+                            blurRadius: 20,
+                            offset: const Offset(0, 10),
+                          ),
+                        ],
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(25),
+                        child: InteractiveViewer(
+                          panEnabled: true,
+                          scaleEnabled: true, // <-- Habilita zoom
+                          minScale: 1.0,
+                          maxScale: 4.0,
+                          child: Image.asset(
+                            widget.imagenes[index],
+                            fit: BoxFit.contain,
+                            height: size.height * 0.85,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+      ),
+    ],
+  );
+}
 }

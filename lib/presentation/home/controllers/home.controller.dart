@@ -32,7 +32,7 @@ class HomeController extends GetxController {
         horario: 'Lunes a Viernes · 9:00 AM – 8:00 PM',
         servicios: ['Orientación', 'Apoyo catálogo'],
         reglas: ['Formar fila', 'No alimentos'],
-        galeria: ['modulo/imagen1.jpeg', 'modulo/imagen2.jpeg'],
+        galeria: ['assets/modulo/imagen1.jpeg', 'assets/modulo/imagen2.jpeg'],
         palabrasClave: [
           'informacion',
           'información',
@@ -69,7 +69,6 @@ class HomeController extends GetxController {
           'front desk',
         ],
       ),
-
       Area(
         nombre: 'Área de inclusión',
         x: 370,
@@ -80,9 +79,9 @@ class HomeController extends GetxController {
         servicios: ['Braille', 'Audiolibros'],
         reglas: ['Prioridad discapacidad'],
         galeria: [
-          'inclusion/imagen1.jpeg',
-          'inclusion/imagen2.jpeg',
-          'inclusion/imagen3.jpeg',
+          'assets/inclusion/imagen1.jpeg',
+          'assets/inclusion/imagen2.jpeg',
+          'assets/inclusion/imagen3.jpeg',
         ],
         palabrasClave: [
           'inclusion',
@@ -112,7 +111,6 @@ class HomeController extends GetxController {
           'apoyo especial',
         ],
       ),
-
       Area(
         nombre: 'Sala multipropósito',
         x: 230,
@@ -122,7 +120,10 @@ class HomeController extends GetxController {
         horario: 'Según programación',
         servicios: ['Talleres', 'Conferencias'],
         reglas: ['Acceso con eventos'],
-        galeria: ['multiproposito/imagen1.jpeg', 'multiproposito/imagen2.jpeg'],
+        galeria: [
+          'assets/multiproposito/imagen1.jpeg',
+          'assets/multiproposito/imagen2.jpeg',
+        ],
         palabrasClave: [
           'sala',
           'salon',
@@ -148,7 +149,6 @@ class HomeController extends GetxController {
           'actividades culturales',
         ],
       ),
-
       Area(
         nombre: 'Sala de juntas',
         x: 370,
@@ -158,7 +158,7 @@ class HomeController extends GetxController {
         horario: 'Lunes a Viernes · 10:00 AM – 6:00 PM',
         servicios: ['Reservación'],
         reglas: ['No alimentos'],
-        galeria: ['salaDeJuntas/imagen1.jpeg'],
+        galeria: ['assets/salaDeJuntas/imagen1.jpeg'],
         palabrasClave: [
           'sala de juntas',
           'juntas',
@@ -182,7 +182,6 @@ class HomeController extends GetxController {
           'oficina reuniones',
         ],
       ),
-
       Area(
         nombre: 'Cafetería',
         x: 620,
@@ -217,7 +216,6 @@ class HomeController extends GetxController {
           'drink',
         ],
       ),
-
       Area(
         nombre: 'Legado N.L.',
         x: 970,
@@ -228,9 +226,9 @@ class HomeController extends GetxController {
         servicios: ['Exposiciones'],
         reglas: ['No tocar'],
         galeria: [
-          'legadoNL/imagen1.jpeg',
-          'legadoNL/imagen2.jpeg',
-          'legadoNL/imagen3.jpeg',
+          'assets/legadoNL/imagen1.jpeg',
+          'assets/legadoNL/imagen2.jpeg',
+          'assets/legadoNL/imagen3.jpeg',
         ],
         palabrasClave: [
           'legado',
@@ -252,7 +250,6 @@ class HomeController extends GetxController {
           'tradiciones',
         ],
       ),
-
       Area(
         nombre: 'Acervo',
         x: 200,
@@ -263,10 +260,10 @@ class HomeController extends GetxController {
         servicios: ['Exposiciones'],
         reglas: ['No tocar'],
         galeria: [
-          'acervo/imagen1.jpeg',
-          'acervo/imagen2.jpeg',
-          'acervo/imagen3.jpeg',
-          'acervo/imagen4.jpeg',
+          'assets/acervo/imagen1.jpeg',
+          'assets/acervo/imagen2.jpeg',
+          'assets/acervo/imagen3.jpeg',
+          'assets/acervo/imagen4.jpeg',
         ],
         palabrasClave: [
           'acervo',
@@ -288,7 +285,6 @@ class HomeController extends GetxController {
           'consulta documentos',
         ],
       ),
-
       Area(
         nombre: 'Cubiculos',
         x: 510,
@@ -298,7 +294,10 @@ class HomeController extends GetxController {
         horario: 'Martes a Domingo · 10:00 AM – 6:00 PM',
         servicios: ['Estudio individual'],
         reglas: ['Silencio'],
-        galeria: ['cubiculos/imagen1.jpeg', 'cubiculos/imagen2.jpeg'],
+        galeria: [
+          'assets/cubiculos/imagen1.jpeg',
+          'assets/cubiculos/imagen2.jpeg',
+        ],
         palabrasClave: [
           'cubiculo',
           'cubículo',
@@ -317,7 +316,6 @@ class HomeController extends GetxController {
           'estudio privado',
         ],
       ),
-
       Area(
         nombre: 'MEZZANINE',
         x: 820,
@@ -327,7 +325,10 @@ class HomeController extends GetxController {
         horario: 'Martes a Domingo · 10:00 AM – 6:00 PM',
         servicios: ['Lectura'],
         reglas: ['Silencio'],
-        galeria: ['mezzanine/imagen1.jpeg', 'mezzanine/imagen2.jpeg'],
+        galeria: [
+          'assets/mezzanine/imagen1.jpeg',
+          'assets/mezzanine/imagen2.jpeg',
+        ],
         palabrasClave: [
           'mezzanine',
           'mezanine',
@@ -353,7 +354,7 @@ class HomeController extends GetxController {
         categoria: 'Ubicación',
         descripcion: 'Te encuentras en el punto de consulta del segundo piso.',
         horario: 'Disponible 24/7',
-        esUbicacionActual: true,
+        esUbicacionActual: false,
         servicios: ['Mapa interactivo', 'Búsqueda de libros'],
         reglas: ['Uso preferente para visitantes'],
         galeria: [],
@@ -379,7 +380,6 @@ class HomeController extends GetxController {
           'location',
         ],
       ),
-
       Area(
         nombre: 'Sala juvenil',
         x: 550,
@@ -390,10 +390,10 @@ class HomeController extends GetxController {
         servicios: ['Mesas'],
         reglas: ['Silencio'],
         galeria: [
-          'salaJuvenil/imagen1.jpeg',
-          'salaJuvenil/imagen2.jpeg',
-          'salaJuvenil/imagen3.jpeg',
-          'salaJuvenil/imagen4.jpeg',
+          'assets/salaJuvenil/imagen1.jpeg',
+          'assets/salaJuvenil/imagen2.jpeg',
+          'assets/salaJuvenil/imagen3.jpeg',
+          'assets/salaJuvenil/imagen4.jpeg',
         ],
         palabrasClave: [
           'juvenil',
@@ -411,7 +411,6 @@ class HomeController extends GetxController {
           'lugar joven',
         ],
       ),
-
       Area(
         nombre: 'Auditorio',
         x: 150,
@@ -422,10 +421,10 @@ class HomeController extends GetxController {
         servicios: ['Escenario', 'Sonido'],
         reglas: ['No alimentos'],
         galeria: [
-          'auditorio/imagen1.jpeg',
-          'auditorio/imagen2.jpeg',
-          'auditorio/imagen3.jpeg',
-          'auditorio/imagen4.jpeg',
+          'assets/auditorio/imagen1.jpeg',
+          'assets/auditorio/imagen2.jpeg',
+          'assets/auditorio/imagen3.jpeg',
+          'assets/auditorio/imagen4.jpeg',
         ],
         sePuedeRentar: true,
         infoRenta: 'Solicitar vía correo con 2 semanas de anticipación.',
@@ -445,7 +444,6 @@ class HomeController extends GetxController {
           'funciones',
         ],
       ),
-
       Area(
         nombre: 'Comicteca',
         x: 990,
@@ -455,7 +453,10 @@ class HomeController extends GetxController {
         horario: '9:00 AM – 8:00 PM',
         servicios: ['Lectura'],
         reglas: ['Cuidar materiales'],
-        galeria: ['comicteca/imagen1.jpeg', 'comicteca/imagen2.jpeg'],
+        galeria: [
+          'assets/comicteca/imagen1.jpeg',
+          'assets/comicteca/imagen2.jpeg',
+        ],
         palabrasClave: [
           'comicteca',
           'comics',
@@ -474,7 +475,6 @@ class HomeController extends GetxController {
           'cultura pop',
         ],
       ),
-
       Area(
         nombre: 'Primera infancia',
         x: 350,
@@ -485,9 +485,9 @@ class HomeController extends GetxController {
         servicios: ['Juegos didácticos'],
         reglas: ['Supervisión adultos'],
         galeria: [
-          'primeraInfancia/imagen1.jpeg',
-          'primeraInfancia/imagen2.jpeg',
-          'primeraInfancia/imagen3.jpeg',
+          'assets/primeraInfancia/imagen1.jpeg',
+          'assets/primeraInfancia/imagen2.jpeg',
+          'assets/primeraInfancia/imagen3.jpeg',
         ],
         palabrasClave: [
           'bebes',
@@ -504,7 +504,6 @@ class HomeController extends GetxController {
           'area niños',
         ],
       ),
-
       Area(
         nombre: 'Cine infantil/Coliseo',
         x: 400,
@@ -515,10 +514,10 @@ class HomeController extends GetxController {
         servicios: ['Cine'],
         reglas: ['Orden'],
         galeria: [
-          'cineInfantil/imagen1.jpeg',
-          'cineInfantil/imagen2.jpeg',
-          'cineInfantil/imagen3.jpeg',
-          'cineInfantil/imagen4.jpeg',
+          'assets/cineInfantil/imagen1.jpeg',
+          'assets/cineInfantil/imagen2.jpeg',
+          'assets/cineInfantil/imagen3.jpeg',
+          'assets/cineInfantil/imagen4.jpeg',
         ],
         palabrasClave: [
           'cine',
@@ -535,7 +534,6 @@ class HomeController extends GetxController {
           'videos',
         ],
       ),
-
       Area(
         nombre: 'Ludoteca',
         x: 580,
@@ -546,10 +544,10 @@ class HomeController extends GetxController {
         servicios: ['Juguetes'],
         reglas: ['Compartir'],
         galeria: [
-          'ludoteca/imagen1.jpeg',
-          'ludoteca/imagen2.jpeg',
-          'ludoteca/imagen3.jpeg',
-          'ludoteca/imagen4.jpeg',
+          'assets/ludoteca/imagen1.jpeg',
+          'assets/ludoteca/imagen2.jpeg',
+          'assets/ludoteca/imagen3.jpeg',
+          'assets/ludoteca/imagen4.jpeg',
         ],
         palabrasClave: [
           'ludoteca',
@@ -566,7 +564,6 @@ class HomeController extends GetxController {
           'jugar niños',
         ],
       ),
-
       Area(
         nombre: 'Zona multimedia',
         x: 800,
@@ -577,9 +574,9 @@ class HomeController extends GetxController {
         servicios: ['Internet'],
         reglas: ['Tiempo limitado'],
         galeria: [
-          'multimedia/imagen1.jpeg',
-          'multimedia/imagen2.jpeg',
-          'multimedia/imagen3.jpeg',
+          'assets/multimedia/imagen1.jpeg',
+          'assets/multimedia/imagen2.jpeg',
+          'assets/multimedia/imagen3.jpeg',
         ],
         palabrasClave: [
           'computadoras',
@@ -596,7 +593,6 @@ class HomeController extends GetxController {
           'buscar en internet',
         ],
       ),
-
       Area(
         nombre: 'Realidad virtual',
         x: 800,
@@ -607,8 +603,8 @@ class HomeController extends GetxController {
         servicios: ['Gafas VR'],
         reglas: ['Uso responsable'],
         galeria: [
-          'realidadVirtual/imagen1.jpeg',
-          'realidadVirtual/imagen2.jpeg',
+          'assets/realidadVirtual/imagen1.jpeg',
+          'assets/realidadVirtual/imagen2.jpeg',
         ],
         palabrasClave: [
           'vr',
@@ -623,7 +619,6 @@ class HomeController extends GetxController {
           'jugar vr',
         ],
       ),
-
       Area(
         nombre: 'Impresión 3D',
         x: 950,
@@ -647,7 +642,6 @@ class HomeController extends GetxController {
           'imprimir figuras',
         ],
       ),
-
       Area(
         nombre: 'Cabina de podcast',
         x: 480,
@@ -658,9 +652,9 @@ class HomeController extends GetxController {
         servicios: ['Grabación'],
         reglas: ['Reservación'],
         galeria: [
-          'podcast/imagen1.jpeg',
-          'podcast/imagen2.jpeg',
-          'podcast/imagen3.jpeg',
+          'assets/podcast/imagen1.jpeg',
+          'assets/podcast/imagen2.jpeg',
+          'assets/podcast/imagen3.jpeg',
         ],
         sePuedeRentar: true,
         palabrasClave: [
@@ -799,7 +793,7 @@ class HomeController extends GetxController {
     query.value = area.nombre;
     searchController.text = area.nombre;
     sugerencias.clear();
-      Get.back();
+    Get.back();
     _aplicarZoomAutomatico(area);
   }
 

@@ -12,11 +12,12 @@ class HomeScreen extends GetView<HomeController> {
 
   @override
   Widget build(BuildContext context) {
+    final bool isMobile = MediaQuery.of(context).size.width < 600;
+
     return Scaffold(
       backgroundColor: const Color(0xFFF5F7FA),
       body: Stack(
         children: [
-          /// --- 1. CAPA DEL MAPA (FONDO) ---
           Obx(
             () => AnimatedPadding(
               duration: const Duration(milliseconds: 50),
@@ -40,8 +41,6 @@ class HomeScreen extends GetView<HomeController> {
                     paddingRight: controller.isPanelOpen.value ? 495 : 60,
                     paddingTop: 150,
                   ),
-
-                  // Widgets flotantes sobre el mapa
                   _buildCategoryFilterBar(),
                   _buildFloatingFloorIndicator(),
                   _buildFloatingMenuButton(),
@@ -50,27 +49,53 @@ class HomeScreen extends GetView<HomeController> {
             ),
           ),
 
-          /// --- 2. CONTROLES DE ZOOM ---
           Obx(
             () => AnimatedPositioned(
               duration: const Duration(milliseconds: 600),
               curve: Curves.easeOutQuart,
               right: controller.isPanelOpen.value ? 465 : 20,
-              bottom: 20,
+              bottom: isMobile ? 100 : 20,
               child: _buildZoomControls(),
             ),
           ),
 
-          /// --- 3. MENÚ LATERAL IZQUIERDO (SIDE NAV) ---
           _buildSideNavigation(context),
 
-          /// --- 4. PANEL DE DETALLES (DERECHA) ---
           Obx(() {
             final isOpen = controller.isPanelOpen.value;
             final area = controller.visibleArea.value;
-
             if (area == null) return const SizedBox.shrink();
 
+            if (isMobile) {
+              // Si es móvil y el panel debería estar abierto, disparamos el BottomSheet
+              if (isOpen) {
+                Future.microtask(() {
+                  Get.bottomSheet(
+                    // Contenedor de pantalla completa
+                    Container(
+                      height: Get.height,
+                      decoration: const BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.vertical(
+                          top: Radius.circular(30),
+                        ),
+                      ),
+                      child: DetallesAreaScreen(area: area),
+                    ),
+                    isScrollControlled: true, // Permite pantalla completa
+                    ignoreSafeArea: false,
+                    enableDrag: true,
+                  ).then((_) {
+                    // Al cerrar el BottomSheet, sincronizamos el estado del controlador
+                    controller.isPanelOpen.value = false;
+                    controller.visibleArea.value = null;
+                  });
+                });
+              }
+              return const SizedBox.shrink();
+            }
+
+            // Mantenemos tu diseño original para Desktop/Web
             return AnimatedPositioned(
               duration: const Duration(milliseconds: 600),
               curve: Curves.easeOutQuart,
@@ -155,182 +180,193 @@ class HomeScreen extends GetView<HomeController> {
       double currentWidth = controller.menuWidth.value;
       bool isMini = currentWidth < 160;
       bool isClosed = currentWidth < 10;
+      bool isMobile = MediaQuery.of(context).size.width < 600;
 
-      return Stack(
-        children: [
-          AnimatedContainer(
-            duration: Duration(
-              milliseconds: controller.isDragging.value ? 0 : 250,
-            ),
-            curve: Curves.easeInOut,
-            width: currentWidth,
-            height: double.infinity,
-            decoration: const BoxDecoration(
-              color: Colors.cyan,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black12,
-                  blurRadius: 10,
-                  spreadRadius: 2,
-                ),
-              ],
-            ),
-            clipBehavior: Clip.hardEdge,
-            child: Stack(
-              children: [
-                SafeArea(
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: isMini ? 8 : 22,
-                      vertical: 50,
+      // --- LÓGICA PARA MÓVIL (BARRA INFERIOR) ---
+      if (isMobile) {
+        // Forzamos el ancho a 0 para que no estorbe al mapa
+        if (currentWidth != 0) {
+          Future.microtask(() => controller.menuWidth.value = 0);
+        }
+
+        return Stack(
+          children: [
+            Positioned(
+              bottom: 20,
+              left: 20,
+              right: 20,
+              child: Container(
+                height: 65,
+                padding: const EdgeInsets.symmetric(horizontal: 10),
+                decoration: BoxDecoration(
+                  color: Colors.cyan,
+                  borderRadius: BorderRadius.circular(40),
+                  boxShadow: const [
+                    BoxShadow(
+                      color: Colors.black26,
+                      blurRadius: 10,
+                      offset: Offset(0, 4),
                     ),
-                    child: Column(
-                      crossAxisAlignment: isMini
-                          ? CrossAxisAlignment.center
-                          : CrossAxisAlignment.start,
-                      children: [
-                        Center(
-                          child: Column(
-                            children: [
-                              Container(
-                                padding: EdgeInsets.all(isMini ? 8 : 14),
-                                decoration: BoxDecoration(
-                                  color: Colors.white.withOpacity(0.15),
-                                  borderRadius: BorderRadius.circular(
-                                    isMini ? 12 : 22,
-                                  ),
-                                ),
-                                child: Image.asset(
-                                  "logos/bce2.png",
-                                  width: isMini ? 40 : 110,
-                                ),
-                              ),
-                              if (!isMini) ...[
-                                const SizedBox(height: 8),
-                                const Text(
-                                  "BCE",
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.w800,
-                                    letterSpacing: 3,
-                                  ),
-                                ),
-                                const SizedBox(height: 6),
-                                const Text(
-                                  "Biblioteca Central de Estado",
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                    color: Colors.white70,
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.w600,
-                                    letterSpacing: 1.2,
-                                  ),
-                                ),
-                                const SizedBox(height: 4),
-                                const Text(
-                                  "Fray Servando Teresa de Mier",
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                    color: Colors.white54,
-                                    fontSize: 10,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                              ],
-                            ],
-                          ),
+                  ],
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    // Ayuda
+                    IconButton(
+                      icon: const Icon(
+                        Icons.help_outline,
+                        color: Colors.white,
+                        size: 26,
+                      ),
+                      onPressed: () => controller.iniciarTutorial(),
+                    ),
+                    // Buscar
+                    _tutorialHighlight(
+                      isActive: controller.missionStep.value == 2,
+                      child: IconButton(
+                        icon: const Icon(
+                          Icons.search,
+                          color: Colors.white,
+                          size: 26,
                         ),
-                        const SizedBox(height: 25),
+                        onPressed: () => _showSearchDialog(),
+                      ),
+                    ),
+                    // Separador visual opcional o espacio
+                    const SizedBox(width: 10),
+                    // Selector de Pisos
+                    _tutorialHighlight(
+                      isActive: controller.missionStep.value == 1,
+                      child: Row(
+                        children: [
+                          _buildMobileFloorButton("P1", 1),
+                          const SizedBox(width: 10),
+                          _buildMobileFloorButton("P2", 2),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        );
+      }
 
-                        _tutorialHighlight(
-                          isActive: controller.missionStep.value == 2,
-                          child: isMini
-                              ? _buildMiniCircleButton(
-                                  Icons.search,
-                                  () => _showSearchDialog(),
-                                )
-                              : Container(
-                                  padding: const EdgeInsets.all(12),
-                                  decoration: BoxDecoration(
-                                    color: Colors.white.withOpacity(0.12),
-                                    borderRadius: BorderRadius.circular(18),
-                                  ),
-                                  child: _buildSearchSection(),
-                                ),
+      // --- LÓGICA PARA DESKTOP (MENU LATERAL) ---
+      return AnimatedContainer(
+        duration: Duration(milliseconds: controller.isDragging.value ? 0 : 250),
+        curve: Curves.easeInOut,
+        width: currentWidth,
+        height: double.infinity,
+        decoration: const BoxDecoration(
+          color: Colors.cyan,
+          boxShadow: [
+            BoxShadow(color: Colors.black12, blurRadius: 10, spreadRadius: 2),
+          ],
+        ),
+        clipBehavior: Clip.hardEdge,
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 30),
+            child: Column(
+              children: [
+                // Header/Logo
+                Center(
+                  child: Column(
+                    children: [
+                      Container(
+                        padding: EdgeInsets.all(isMini ? 8 : 14),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.15),
+                          borderRadius: BorderRadius.circular(isMini ? 12 : 22),
                         ),
-                        const SizedBox(height: 25),
-
-                        if (!isMini)
-                          const Text(
-                            'SELECCIONAR PISO',
-                            style: TextStyle(
-                              color: Colors.white70,
-                              fontSize: 11,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        const SizedBox(height: 10),
-
-                        Expanded(
-                          child: _tutorialHighlight(
-                            isActive: controller.missionStep.value == 1,
-                            child: _buildFloorList(isMini),
-                          ),
+                        child: Image.asset(
+                          "logos/bce2.png",
+                          width: isMini ? 40 : 110,
                         ),
-                        Column(
-                          crossAxisAlignment: isMini
-                              ? CrossAxisAlignment.center
-                              : CrossAxisAlignment.start,
-                          children: [
-                            const SizedBox(height: 10),
-                            isMini
-                                ? _buildMiniCircleButton(
-                                    Icons.help_outline,
-                                    () => controller.iniciarTutorial(),
-                                  )
-                                : _buildHelpButton(),
-                          ],
-                        ),
-                        SizedBox(height: 16.0),
-                        Positioned(
-                          top: 10,
-                          right: 10,
-                          child: GestureDetector(
-                            onTap: () {
-                              controller.isDragging.value = false;
-                              controller.menuWidth.value = isMini ? 320 : 80;
-                            },
-                            child: Container(
-                              width: 32,
-                              height: 32,
-                              decoration: BoxDecoration(
-                                color: Colors.white.withOpacity(0.2),
-                                shape: BoxShape.circle,
-                              ),
-                              child: Icon(
-                                isMini
-                                    ? Icons.chevron_right
-                                    : Icons.chevron_left,
-                                color: Colors.white,
-                                size: 20,
-                              ),
-                            ),
+                      ),
+                      if (!isMini) ...[
+                        const SizedBox(height: 12),
+                        const Text(
+                          "BCE",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
                       ],
-                    ),
+                    ],
                   ),
                 ),
+                const SizedBox(height: 25),
+                // Buscador
+                _tutorialHighlight(
+                  isActive: controller.missionStep.value == 2,
+                  child: isMini
+                      ? _buildMiniCircleButton(
+                          Icons.search,
+                          () => _showSearchDialog(),
+                        )
+                      : _buildSearchSection(),
+                ),
+                const SizedBox(height: 25),
+                // Lista de Pisos
+                Expanded(child: _buildFloorList(isMini)),
+                const SizedBox(height: 20),
+                // Ayuda
+                _buildMiniCircleButton(
+                  Icons.help_outline,
+                  () => controller.iniciarTutorial(),
+                ),
+                const SizedBox(height: 15),
+                // Flecha para cerrar (Abajo)
+                if (!isClosed)
+                  Center(
+                    child: IconButton(
+                      icon: Icon(
+                        isMini ? Icons.chevron_right : Icons.chevron_left,
+                        color: Colors.white,
+                      ),
+                      onPressed: () =>
+                          controller.menuWidth.value = isMini ? 320 : 80,
+                    ),
+                  ),
               ],
             ),
           ),
-        ],
+        ),
       );
     });
   }
 
-  // Widget auxiliar para botones modo mini
+  Widget _buildMobileFloorButton(String label, int floorValue) {
+    return Obx(() {
+      bool isSelected = controller.pisoActual.value == floorValue;
+      return GestureDetector(
+        onTap: () => controller.pisoActual.value = floorValue,
+        child: Container(
+          width: 42,
+          height: 42,
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            color: isSelected ? Colors.white : Colors.white.withOpacity(0.2),
+            shape: BoxShape.circle,
+          ),
+          child: Text(
+            label,
+            style: TextStyle(
+              color: isSelected ? Colors.cyan : Colors.white,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+      );
+    });
+  }
+
   Widget _buildMiniCircleButton(IconData icon, VoidCallback onTap) {
     return InkWell(
       onTap: onTap,
