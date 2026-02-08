@@ -91,40 +91,43 @@ class HomeScreen extends GetView<HomeController> {
               top: 25,
               bottom: 25,
               width: 420,
-              child: GestureDetector(
-                onPanUpdate: (details) {
-                  final tc = controller.transformationController;
-                  Matrix4 matrix = tc.value;
-                  double scale = matrix.getMaxScaleOnAxis();
-                  matrix.translate(
-                    details.delta.dx / scale,
-                    details.delta.dy / scale,
-                  );
-                  tc.value = matrix;
-                },
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.75),
-                    borderRadius: BorderRadius.circular(40),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.12),
-                        blurRadius: 35,
-                        spreadRadius: 5,
-                        offset: const Offset(-5, 0),
-                      ),
-                    ],
-                  ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(40),
-                    child: BackdropFilter(
-                      filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
-                      child: DetallesAreaScreen(area: area),
-                    ),
-                  ),
-                ),
-              ),
-            );
+              child:  GestureDetector(
+  // Este onPanUpdate mueve el mapa en tiempo real, incluso si arrastras desde el panel
+  onPanUpdate: (details) {
+    final tc = controller.transformationController;
+    final matrix = tc.value.clone(); // clonamos la matriz para no romperla
+    final scale = matrix.getMaxScaleOnAxis();
+
+    // Movemos la matriz proporcional al delta del arrastre
+    matrix.translate(details.delta.dx / scale, details.delta.dy / scale);
+
+    // Actualizamos el transformationController para que el mapa se mueva inmediatamente
+    tc.value = matrix;
+  },
+  behavior: HitTestBehavior.translucent, // Esto asegura que el detector capture arrastre incluso en áreas transparentes
+  child: Container(
+    decoration: BoxDecoration(
+      color: Colors.white.withOpacity(0.75),
+      borderRadius: BorderRadius.circular(40),
+      boxShadow: [
+        BoxShadow(
+          color: Colors.black.withOpacity(0.12),
+          blurRadius: 35,
+          spreadRadius: 5,
+          offset: const Offset(-5, 0),
+        ),
+      ],
+    ),
+    child: ClipRRect(
+      borderRadius: BorderRadius.circular(40),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
+        child: DetallesAreaScreen(area: area),
+      ),
+    ),
+  ),
+),
+    );
           }),
 
           /// --- 5. BANNER DE MISIÓN ---

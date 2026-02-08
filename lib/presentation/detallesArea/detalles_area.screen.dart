@@ -138,37 +138,90 @@ class DetallesAreaScreen extends StatelessWidget {
   }
 
 Widget _buildCompactGallery(List<String> imagenes, String title) {
-  return SizedBox(
-    height: 120,
-    child: ScrollConfiguration(
-      behavior: ScrollConfiguration.of(Get.context!).copyWith(
-        dragDevices: {
-          PointerDeviceKind.touch,
-          PointerDeviceKind.mouse, // <-- Habilita scroll con mouse
-          PointerDeviceKind.stylus,
-          PointerDeviceKind.trackpad,
-        },
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        child: Text(
+          title,
+          style: const TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            color: Colors.black87,
+          ),
+        ),
       ),
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        itemCount: imagenes.isEmpty ? 1 : imagenes.length,
-        itemBuilder: (context, index) => GestureDetector(
-          onTap: () => _abrirImagenPantallaCompleta(context, imagenes, index, title),
-          child: Container(
-            margin: const EdgeInsets.only(right: 8),
-            width: 180,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(12),
-              color: Colors.grey.shade200,
+      SizedBox(
+        height: 120,
+        child: ScrollConfiguration(
+          behavior: ScrollConfiguration.of(Get.context!).copyWith(
+            dragDevices: {
+              PointerDeviceKind.touch,
+              PointerDeviceKind.mouse, // habilita scroll con mouse
+              PointerDeviceKind.stylus,
+              PointerDeviceKind.trackpad,
+            },
+          ),
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            itemCount: imagenes.isEmpty ? 1 : imagenes.length,
+            itemBuilder: (context, index) => GestureDetector(
+              onTap: () => _abrirImagenPantallaCompleta(
+                context,
+                imagenes,
+                index,
+                title,
+              ),
+              child: Container(
+                margin: const EdgeInsets.only(right: 8),
+                width: 180,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12),
+                  color: Colors.grey.shade200,
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: imagenes.isEmpty
+                      ? const Icon(Icons.image_outlined)
+                      : Hero(
+                          tag: 'img_$index',
+                          child: Image.asset(
+                            imagenes[index],
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                ),
+              ),
             ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(12),
-              child: imagenes.isEmpty
-                  ? const Icon(Icons.image_outlined)
-                  : Hero(
-                      tag: 'img_$index',
-                      child: Image.asset(imagenes[index], fit: BoxFit.cover),
-                    ),
+          ),
+        ),
+      ),
+    ],
+  );
+}
+
+// Este método abre la imagen en pantalla completa
+void _abrirImagenPantallaCompleta(BuildContext context, List<String> imagenes,
+    int index, String title) {
+  Get.dialog(
+    Center(
+      child: Material(
+        color: Colors.transparent,
+        child: Container(
+          width: 600,
+          height: 400,
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(24),
+          ),
+          child: PageView.builder(
+            controller: PageController(initialPage: index),
+            itemCount: imagenes.length,
+            itemBuilder: (context, i) => Hero(
+              tag: 'img_$i',
+              child: Image.asset(imagenes[i], fit: BoxFit.contain),
             ),
           ),
         ),
@@ -176,16 +229,6 @@ Widget _buildCompactGallery(List<String> imagenes, String title) {
     ),
   );
 }
-
-  void _abrirImagenPantallaCompleta(BuildContext context, List<String> imagenes, int initialIndex, String title) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        fullscreenDialog: true,
-        builder: (context) => GaleriaAvanzadaScreen(imagenes: imagenes, initialIndex: initialIndex, title: title),
-      ),
-    );
-  }
 
   Widget _buildCompactInfoRow(Area area) {
     return Column(
