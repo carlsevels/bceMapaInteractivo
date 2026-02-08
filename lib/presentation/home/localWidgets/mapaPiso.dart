@@ -1,7 +1,7 @@
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:mapa_interactivo/infrastructure/models/area.dart';
 import 'package:vector_math/vector_math_64.dart' as vmath;
-import 'dart:math';
 
 class MapaPiso extends StatelessWidget {
   final String image;
@@ -11,6 +11,8 @@ class MapaPiso extends StatelessWidget {
   final int missionStep;
   final Function(Area) onAreaTap;
   final TransformationController transformationController;
+  final double paddingRight;
+  final double paddingTop; // 🔹 Nuevo parámetro
 
   const MapaPiso({
     Key? key,
@@ -21,6 +23,8 @@ class MapaPiso extends StatelessWidget {
     required this.missionStep,
     required this.onAreaTap,
     required this.transformationController,
+    this.paddingRight = 20.0,
+    this.paddingTop = 20.0, // 🔹 Valor por defecto
   }) : super(key: key);
 
   String _removeAccents(String text) {
@@ -38,7 +42,6 @@ class MapaPiso extends StatelessWidget {
       builder: (context, constraints) {
         final size = Size(constraints.maxWidth, constraints.maxHeight);
 
-        // Filtrado de áreas para mostrar en el mapa
         final visibleAreas = areas.where((area) {
           if (area.esUbicacionActual) return true;
           if (selectedCategory != null && selectedCategory!.isNotEmpty) {
@@ -83,7 +86,7 @@ class MapaPiso extends StatelessWidget {
               ),
             ),
 
-            // 🔹 FLECHA DINÁMICA HACIA "UBICACIÓN ACTUAL"
+            // 🔹 FLECHA DINÁMICA CON PADDING SUPERIOR Y DERECHO
             AnimatedBuilder(
               animation: transformationController,
               builder: (context, child) {
@@ -110,21 +113,22 @@ class MapaPiso extends StatelessWidget {
                       vmath.Vector3(userLocation.x, userLocation.y, 0),
                     );
 
-                const double margin = 50.0;
+                const double margin = 60.0;
+                final double limitRight = size.width - paddingRight;
+                final double limitTop =
+                    paddingTop; // 🔹 Límite superior dinámico
+
                 bool isOutside =
                     posInScreen.x < margin ||
-                    posInScreen.x > size.width - margin ||
-                    posInScreen.y < margin ||
+                    posInScreen.x > limitRight ||
+                    posInScreen.y < limitTop || // 🔹 Ajuste aquí
                     posInScreen.y > size.height - margin;
 
                 if (!isOutside) return const SizedBox.shrink();
 
-                final double arrowX = posInScreen.x.clamp(
-                  margin,
-                  size.width - margin,
-                );
+                final double arrowX = posInScreen.x.clamp(margin, limitRight);
                 final double arrowY = posInScreen.y.clamp(
-                  margin,
+                  limitTop,
                   size.height - margin,
                 );
                 final double angle = atan2(
@@ -132,42 +136,46 @@ class MapaPiso extends StatelessWidget {
                   posInScreen.x - arrowX,
                 );
 
-                return Positioned(
+                return AnimatedPositioned(
+                  duration: const Duration(milliseconds: 600),
+                  curve: Curves.easeOutQuart,
                   left: arrowX - 25,
                   top: arrowY - 25,
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Transform.rotate(
-                        angle: angle + (pi / 2),
-                        child: const Icon(
-                          Icons.navigation,
-                          size: 40,
-                          color: Colors.redAccent,
-                        ),
-                      ),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 6,
-                          vertical: 2,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.redAccent,
-                          borderRadius: BorderRadius.circular(4),
-                          boxShadow: const [
-                            BoxShadow(color: Colors.black26, blurRadius: 4),
-                          ],
-                        ),
-                        child: const Text(
-                          "ESTÁS AQUÍ",
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 9,
-                            fontWeight: FontWeight.bold,
+                  child: IgnorePointer(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Transform.rotate(
+                          angle: angle + (pi / 2),
+                          child: const Icon(
+                            Icons.navigation,
+                            size: 45,
+                            color: Colors.redAccent,
                           ),
                         ),
-                      ),
-                    ],
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 4,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.redAccent,
+                            borderRadius: BorderRadius.circular(8),
+                            boxShadow: const [
+                              BoxShadow(color: Colors.black26, blurRadius: 6),
+                            ],
+                          ),
+                          child: const Text(
+                            "ESTÁS AQUÍ",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 );
               },
@@ -217,7 +225,7 @@ class _PulseMarkerState extends State<_PulseMarker>
   Widget build(BuildContext context) {
     final Color mainColor = widget.isUserLocation
         ? Colors.redAccent
-        : (widget.isHighlighted ? Colors.amber : Colors.indigo);
+        : (widget.isHighlighted ? Colors.orange : Colors.indigo);
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -227,14 +235,14 @@ class _PulseMarkerState extends State<_PulseMarker>
           children: [
             if (widget.isHighlighted || widget.isUserLocation)
               FadeTransition(
-                opacity: Tween(begin: 0.5, end: 0.0).animate(_controller),
+                opacity: Tween(begin: 0.6, end: 0.0).animate(_controller),
                 child: ScaleTransition(
-                  scale: Tween(begin: 1.0, end: 2.5).animate(_controller),
+                  scale: Tween(begin: 1.0, end: 3.0).animate(_controller),
                   child: Container(
                     width: 30,
                     height: 30,
                     decoration: BoxDecoration(
-                      color: mainColor,
+                      color: mainColor.withOpacity(0.5),
                       shape: BoxShape.circle,
                     ),
                   ),
@@ -244,35 +252,41 @@ class _PulseMarkerState extends State<_PulseMarker>
               decoration: BoxDecoration(
                 color: mainColor,
                 shape: BoxShape.circle,
-                border: Border.all(color: Colors.white, width: 2),
-                boxShadow: const [
-                  BoxShadow(color: Colors.black26, blurRadius: 4),
+                border: Border.all(color: Colors.white, width: 2.5),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.2),
+                    blurRadius: 5,
+                    offset: const Offset(0, 3),
+                  ),
                 ],
               ),
-              padding: const EdgeInsets.all(4),
+              padding: const EdgeInsets.all(5),
               child: Icon(
                 widget.isUserLocation ? Icons.person_pin : Icons.location_on,
                 color: Colors.white,
-                size: (widget.isHighlighted || widget.isUserLocation) ? 22 : 16,
+                size: (widget.isHighlighted || widget.isUserLocation) ? 24 : 18,
               ),
             ),
           ],
         ),
-        const SizedBox(height: 4),
+        const SizedBox(height: 5),
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
           decoration: BoxDecoration(
             color: widget.isUserLocation
                 ? Colors.redAccent
-                : (widget.isHighlighted ? Colors.amber : Colors.black87),
-            borderRadius: BorderRadius.circular(8),
+                : (widget.isHighlighted ? Colors.orange : Colors.black87),
+            borderRadius: BorderRadius.circular(10),
+            boxShadow: const [BoxShadow(color: Colors.black12, blurRadius: 4)],
           ),
           child: Text(
             widget.nombre.toUpperCase(),
             style: const TextStyle(
-              fontSize: 8,
+              fontSize: 9,
               color: Colors.white,
-              fontWeight: FontWeight.bold,
+              fontWeight: FontWeight.w900,
+              letterSpacing: 0.5,
             ),
           ),
         ),
