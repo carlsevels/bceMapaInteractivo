@@ -190,34 +190,57 @@ class HomeScreen extends GetView<HomeController> {
                           : CrossAxisAlignment.start,
                       children: [
                         Center(
-                          child: Container(
-                            padding: EdgeInsets.all(isMini ? 8 : 14),
-                            decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.15),
-                              borderRadius: BorderRadius.circular(
-                                isMini ? 12 : 22,
+                          child: Column(
+                            children: [
+                              Container(
+                                padding: EdgeInsets.all(isMini ? 8 : 14),
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withOpacity(0.15),
+                                  borderRadius: BorderRadius.circular(
+                                    isMini ? 12 : 22,
+                                  ),
+                                ),
+                                child: Image.asset(
+                                  "logos/bce2.png",
+                                  width: isMini ? 40 : 110,
+                                ),
                               ),
-                            ),
-                            child: Image.asset(
-                              "logos/bce2.png",
-                              width: isMini ? 35 : 100,
-                            ),
+                              if (!isMini) ...[
+                                const SizedBox(height: 8),
+                                const Text(
+                                  "BCE",
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.w800,
+                                    letterSpacing: 3,
+                                  ),
+                                ),
+                                const SizedBox(height: 6),
+                                const Text(
+                                  "Biblioteca Central de Estado",
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    color: Colors.white70,
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w600,
+                                    letterSpacing: 1.2,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                const Text(
+                                  "Fray Servando Teresa de Mier",
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    color: Colors.white54,
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ],
+                            ],
                           ),
                         ),
-                        if (!isMini) ...[
-                          const SizedBox(height: 12),
-                          const Center(
-                            child: Text(
-                              "BCE",
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 18,
-                                fontWeight: FontWeight.w800,
-                                letterSpacing: 2,
-                              ),
-                            ),
-                          ),
-                        ],
                         const SizedBox(height: 25),
 
                         _tutorialHighlight(
