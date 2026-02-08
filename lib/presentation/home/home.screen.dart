@@ -807,7 +807,7 @@ class HomeScreen extends GetView<HomeController> {
           opacity: tutorialActivo ? 0.5 : 1.0,
           child: FloatingActionButton.extended(
             heroTag: 'menu_fab',
-            backgroundColor: Colors.white,
+            backgroundColor: Colors.cyan,
             elevation: 4,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(16),
@@ -830,7 +830,7 @@ class HomeScreen extends GetView<HomeController> {
             label: Text(
               isFull ? "MINIMIZAR" : (isMini ? "CERRAR" : "EXPLORAR"),
               style: TextStyle(
-                color: tutorialActivo ? Colors.grey : Colors.cyan[800],
+                color: tutorialActivo ? Colors.white : Colors.white,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -838,7 +838,7 @@ class HomeScreen extends GetView<HomeController> {
               isClosed
                   ? Icons.menu_open_rounded
                   : (isFull ? Icons.unfold_less_rounded : Icons.close),
-              color: tutorialActivo ? Colors.grey : Colors.cyan[800],
+              color: tutorialActivo ? Colors.white : Colors.white,
             ),
           ),
         );
