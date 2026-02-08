@@ -158,7 +158,7 @@ Widget _buildCompactGallery(List<String> imagenes, String title) {
           behavior: ScrollConfiguration.of(Get.context!).copyWith(
             dragDevices: {
               PointerDeviceKind.touch,
-              PointerDeviceKind.mouse, // habilita scroll con mouse
+              PointerDeviceKind.mouse,
               PointerDeviceKind.stylus,
               PointerDeviceKind.trackpad,
             },
@@ -202,33 +202,24 @@ Widget _buildCompactGallery(List<String> imagenes, String title) {
 }
 
 // Este método abre la imagen en pantalla completa
-void _abrirImagenPantallaCompleta(BuildContext context, List<String> imagenes,
-    int index, String title) {
-  Get.dialog(
-    Center(
-      child: Material(
-        color: Colors.transparent,
-        child: Container(
-          width: 600,
-          height: 400,
-          padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(24),
-          ),
-          child: PageView.builder(
-            controller: PageController(initialPage: index),
-            itemCount: imagenes.length,
-            itemBuilder: (context, i) => Hero(
-              tag: 'img_$i',
-              child: Image.asset(imagenes[i], fit: BoxFit.contain),
-            ),
-          ),
+  void _abrirImagenPantallaCompleta(
+    BuildContext context,
+    List<String> imagenes,
+    int initialIndex,
+    String title,
+  ) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        fullscreenDialog: true,
+        builder: (context) => GaleriaAvanzadaScreen(
+          imagenes: imagenes,
+          initialIndex: initialIndex,
+          title: title,
         ),
       ),
-    ),
-  );
-}
+    );
+  }
 
   Widget _buildCompactInfoRow(Area area) {
     return Column(

@@ -773,7 +773,7 @@ class HomeScreen extends GetView<HomeController> {
           ),
           child: Obx(
             () => Text(
-              "NIVEL ${controller.pisoActual.value}",
+              "PISO ${controller.pisoActual.value}",
               style: TextStyle(
                 fontWeight: FontWeight.w900,
                 color: Colors.cyan[900],
