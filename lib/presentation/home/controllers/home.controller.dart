@@ -360,7 +360,7 @@ class HomeController extends GetxController {
         esUbicacionActual: true,
         servicios: ['Mapa interactivo', 'Búsqueda de libros'],
         reglas: ['Uso preferente para visitantes'],
-        galeria: ['assets/multimedia/vr_1.png'],
+        galeria: [],
         palabrasClave: [
           'ubicacion',
           'ubicación',
@@ -754,6 +754,7 @@ class HomeController extends GetxController {
 
   void closePanel() {
     isPanelOpen.value = false;
+
     Future.delayed(const Duration(milliseconds: 800), () {
       visibleArea.value = null;
       selectedArea.value = null;
@@ -762,7 +763,9 @@ class HomeController extends GetxController {
 
   void buscarSugerencias(String val) {
     query.value = val;
-
+    isPanelOpen.value = false;
+    categoriaSeleccionada.value = "";
+    resetZoom();
     if (val.trim().isEmpty) {
       sugerencias.clear();
       return;
