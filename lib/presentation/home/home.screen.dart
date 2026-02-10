@@ -286,7 +286,7 @@ class HomeScreen extends GetView<HomeController> {
                       if (!isMini) ...[
                         const SizedBox(height: 12),
                         const Text(
-                          "BCE",
+                          "BCE 2",
                           style: TextStyle(
                             color: Colors.white,
                             fontSize: 18,
