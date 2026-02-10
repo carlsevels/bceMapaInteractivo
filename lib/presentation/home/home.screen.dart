@@ -32,7 +32,7 @@ class HomeScreen extends GetView<HomeController> {
                   children: [
                     MapaPiso(
                       key: ValueKey(controller.pisoActual.value),
-                      image: 'assets/piso_${controller.pisoActual.value}.png',
+                      image: 'piso_${controller.pisoActual.value}.png',
                       areas:
                           controller.pisos[controller.pisoActual.value] ?? [],
                       currentQuery: controller.query.value,
@@ -781,7 +781,7 @@ class HomeScreen extends GetView<HomeController> {
             : MainAxisAlignment.start,
         children: [
           isMobil
-              ? SizedBox(width: 50, child: Image.asset("assets/logos/bce2.png"))
+              ? SizedBox(width: 50, child: Image.asset("logos/bce2.png"))
               : SizedBox.shrink(),
           ClipRRect(
             borderRadius: BorderRadius.circular(16),
