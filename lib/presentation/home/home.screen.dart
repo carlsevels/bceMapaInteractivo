@@ -20,14 +20,16 @@ class HomeScreen extends GetView<HomeController> {
       body: SafeArea(
         child: Stack(
           children: [
+            // CAPA 1: MAPA Y FILTROS FLOTANTES
+            // Reemplazamos AnimatedPadding por AnimatedPositioned para evitar errores de ParentData en Web
             Obx(
-              () => AnimatedPadding(
-                duration: const Duration(milliseconds: 50),
+              () => AnimatedPositioned(
+                duration: const Duration(milliseconds: 200),
                 curve: Curves.easeOut,
-                padding: EdgeInsets.only(
-                  left: controller.menuWidth.value,
-                  right: 0,
-                ),
+                top: 0,
+                bottom: 0,
+                left: controller.menuWidth.value,
+                right: 0,
                 child: Stack(
                   children: [
                     MapaPiso(
@@ -46,12 +48,15 @@ class HomeScreen extends GetView<HomeController> {
                     ),
                     _buildCategoryFilterBar(isMobile),
                     _buildFloatingFloorIndicator(isMobile),
-                    _buildFloatingMenuButton(),
                   ],
                 ),
               ),
             ),
 
+            // CAPA 2: BOTÓN DE MENÚ (Debe estar fuera del AnimatedPositioned anterior)
+            _buildFloatingMenuButton(),
+
+            // CAPA 3: CONTROLES DE ZOOM
             Obx(
               () => AnimatedPositioned(
                 duration: const Duration(milliseconds: 600),
@@ -62,19 +67,19 @@ class HomeScreen extends GetView<HomeController> {
               ),
             ),
 
+            // CAPA 4: NAVEGACIÓN LATERAL
             _buildSideNavigation(context),
 
+            // CAPA 5: PANEL DE DETALLES (Lógica Obx para Mobile y Desktop)
             Obx(() {
               final isOpen = controller.isPanelOpen.value;
               final area = controller.visibleArea.value;
               if (area == null) return const SizedBox.shrink();
 
               if (isMobile) {
-                // Si es móvil y el panel debería estar abierto, disparamos el BottomSheet
                 if (isOpen) {
                   Future.microtask(() {
                     Get.bottomSheet(
-                      // Contenedor de pantalla completa
                       Container(
                         height: Get.height,
                         decoration: const BoxDecoration(
@@ -85,11 +90,10 @@ class HomeScreen extends GetView<HomeController> {
                         ),
                         child: DetallesAreaScreen(area: area),
                       ),
-                      isScrollControlled: true, // Permite pantalla completa
+                      isScrollControlled: true,
                       ignoreSafeArea: false,
                       enableDrag: true,
                     ).then((_) {
-                      // Al cerrar el BottomSheet, sincronizamos el estado del controlador
                       controller.isPanelOpen.value = false;
                       controller.visibleArea.value = null;
                     });
@@ -98,7 +102,6 @@ class HomeScreen extends GetView<HomeController> {
                 return const SizedBox.shrink();
               }
 
-              // Mantenemos tu diseño original para Desktop/Web
               return AnimatedPositioned(
                 duration: const Duration(milliseconds: 600),
                 curve: Curves.easeOutQuart,
@@ -111,12 +114,10 @@ class HomeScreen extends GetView<HomeController> {
                     final tc = controller.transformationController;
                     final matrix = tc.value.clone();
                     final scale = matrix.getMaxScaleOnAxis();
-
                     matrix.translate(
                       details.delta.dx / scale,
                       details.delta.dy / scale,
                     );
-
                     tc.value = matrix;
                   },
                   behavior: HitTestBehavior.translucent,
@@ -145,7 +146,7 @@ class HomeScreen extends GetView<HomeController> {
               );
             }),
 
-            /// --- 5. BANNER DE MISIÓN ---
+            // CAPA 6: BANNER DE MISIÓN
             _buildMissionBanner(),
           ],
         ),
@@ -773,7 +774,7 @@ class HomeScreen extends GetView<HomeController> {
   }
 
   Widget _buildFloatingFloorIndicator(bool isMobile) => Positioned(
-    top: 20, // Ajusta esta altura a tu gusto
+    top: 20,
     left: 20,
     right: 20,
     child: Row(
@@ -813,6 +814,7 @@ class HomeScreen extends GetView<HomeController> {
       ],
     ),
   );
+
   Widget _buildFloatingMenuButton() {
     return Positioned(
       bottom: 30,

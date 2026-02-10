@@ -3,6 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:mapa_interactivo/infrastructure/models/area.dart';
 import 'package:vector_math/vector_math_64.dart' as vmath;
 
+import 'dart:math';
+import 'package:flutter/material.dart';
+import 'package:mapa_interactivo/infrastructure/models/area.dart';
+import 'package:vector_math/vector_math_64.dart' as vmath;
+
 class MapaPiso extends StatelessWidget {
   final String image;
   final List<Area> areas;
@@ -52,7 +57,7 @@ class MapaPiso extends StatelessWidget {
 
         return Stack(
           children: [
-            // CAPA 1: El mapa interactivo y los marcadores
+            // CAPA 1: Imagen y Marcadores
             InteractiveViewer(
               transformationController: transformationController,
               constrained: false,
@@ -85,31 +90,22 @@ class MapaPiso extends StatelessWidget {
               ),
             ),
 
-            // CAPA 2: Indicador de "Estás aquí" (Flecha fuera de pantalla)
+            // CAPA 2: Indicador "ESTÁS AQUÍ"
             AnimatedBuilder(
               animation: transformationController,
               builder: (context, child) {
                 final userLocation = areas.firstWhere(
                   (a) => a.esUbicacionActual,
                   orElse: () => Area(
-                    nombre: '',
-                    descripcion: '',
-                    x: -1000,
-                    y: -1000,
-                    horario: [],
-                    servicios: [],
-                    reglas: [],
-                    galeria: [],
-                    categoria: '',
-                    palabrasClave: [],
+                    nombre: '', x: -1000, y: -1000, descripcion: '',
+                    horario: [], servicios: [], reglas: [],
+                    galeria: [], categoria: '', palabrasClave: [],
                   ),
                 );
 
-                // Si no hay usuario, ocultamos el widget
                 if (userLocation.x == -1000) return const SizedBox.shrink();
 
-                final vmath.Vector3 posInScreen =
-                    transformationController.value.transform3(
+                final vmath.Vector3 posInScreen = transformationController.value.transform3(
                   vmath.Vector3(userLocation.x, userLocation.y, 0),
                 );
 
@@ -122,21 +118,13 @@ class MapaPiso extends StatelessWidget {
                     posInScreen.y < limitTop ||
                     posInScreen.y > size.height - margin;
 
-                // Solo mostramos la flecha si el usuario está fuera del área visible
                 if (!isOutside) return const SizedBox.shrink();
 
                 final double arrowX = posInScreen.x.clamp(margin, limitRight);
-                final double arrowY =
-                    posInScreen.y.clamp(limitTop, size.height - margin);
-                final double angle = atan2(
-                  posInScreen.y - arrowY,
-                  posInScreen.x - arrowX,
-                );
+                final double arrowY = posInScreen.y.clamp(limitTop, size.height - margin);
+                final double angle = atan2(posInScreen.y - arrowY, posInScreen.x - arrowX);
 
-                // IMPORTANTE: AnimatedPositioned debe ser el retorno directo
-                return AnimatedPositioned(
-                  duration: const Duration(milliseconds: 600),
-                  curve: Curves.easeOutQuart,
+                return Positioned( // Cambiado a Positioned simple para evitar conflictos de ParentData
                   left: arrowX - 25,
                   top: arrowY - 25,
                   child: IgnorePointer(
@@ -145,31 +133,18 @@ class MapaPiso extends StatelessWidget {
                       children: [
                         Transform.rotate(
                           angle: angle + (pi / 2),
-                          child: const Icon(
-                            Icons.navigation,
-                            size: 45,
-                            color: Colors.redAccent,
-                          ),
+                          child: const Icon(Icons.navigation, size: 45, color: Colors.redAccent),
                         ),
                         Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 4,
-                          ),
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                           decoration: BoxDecoration(
                             color: Colors.redAccent,
                             borderRadius: BorderRadius.circular(8),
-                            boxShadow: const [
-                              BoxShadow(color: Colors.black26, blurRadius: 6),
-                            ],
+                            boxShadow: const [BoxShadow(color: Colors.black26, blurRadius: 6)],
                           ),
                           child: const Text(
                             "ESTÁS AQUÍ",
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 10,
-                              fontWeight: FontWeight.bold,
-                            ),
+                            style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
                           ),
                         ),
                       ],
@@ -185,6 +160,7 @@ class MapaPiso extends StatelessWidget {
   }
 }
 
+// (La clase _PulseMarker se mantiene igual que la tienes)
 // Marcador con animación de pulso
 class _PulseMarker extends StatefulWidget {
   final String nombre;
