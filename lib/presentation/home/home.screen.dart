@@ -10,7 +10,7 @@ class HomeScreen extends GetView<HomeController> {
     Get.put(HomeController());
   }
 
-@override
+  @override
   Widget build(BuildContext context) {
     final bool isMobile = MediaQuery.of(context).size.width < 600;
 
@@ -20,40 +20,39 @@ class HomeScreen extends GetView<HomeController> {
       body: SafeArea(
         child: Stack(
           children: [
-            // Mantenemos tu AnimatedPadding para que el mapa ocupe todo el espacio
+            // CAMBIO TÉCNICO: Usamos AnimatedContainer con margin.
+            // El margin hace lo mismo que el padding, pero no rompe los Positioned hijos en Web.
             Obx(
-              () => AnimatedPadding(
+              () => AnimatedContainer(
                 duration: const Duration(milliseconds: 50),
                 curve: Curves.easeOut,
-                padding: EdgeInsets.only(
-                  left: controller.menuWidth.value,
-                  right: 0,
-                ),
-                child: SizedBox.expand( // Agregamos esto para forzar el tamaño
-                  child: Stack(
-                    children: [
-                      MapaPiso(
-                        key: ValueKey(controller.pisoActual.value),
-                        image: 'assets/piso_${controller.pisoActual.value}.png',
-                        areas: controller.pisos[controller.pisoActual.value] ?? [],
-                        currentQuery: controller.query.value,
-                        selectedCategory: controller.categoriaSeleccionada.value,
-                        missionStep: controller.missionStep.value,
-                        onAreaTap: controller.onAreaSelected,
-                        transformationController: controller.transformationController,
-                        paddingRight: controller.isPanelOpen.value ? 495 : 60,
-                        paddingTop: 150,
-                      ),
-                      _buildCategoryFilterBar(isMobile),
-                      _buildFloatingFloorIndicator(isMobile),
-                      _buildFloatingMenuButton(),
-                    ],
-                  ),
+                margin: EdgeInsets.only(left: controller.menuWidth.value),
+                child: Stack(
+                  // Quitamos el SizedBox.expand innecesario para evitar colapsos
+                  children: [
+                    MapaPiso(
+                      key: ValueKey(controller.pisoActual.value),
+                      image: 'assets/piso_${controller.pisoActual.value}.png',
+                      areas:
+                          controller.pisos[controller.pisoActual.value] ?? [],
+                      currentQuery: controller.query.value,
+                      selectedCategory: controller.categoriaSeleccionada.value,
+                      missionStep: controller.missionStep.value,
+                      onAreaTap: controller.onAreaSelected,
+                      transformationController:
+                          controller.transformationController,
+                      paddingRight: controller.isPanelOpen.value ? 495 : 60,
+                      paddingTop: 150,
+                    ),
+                    _buildCategoryFilterBar(isMobile),
+                    _buildFloatingFloorIndicator(isMobile),
+                    _buildFloatingMenuButton(),
+                  ],
                 ),
               ),
             ),
 
-            // Controles de zoom (Fuera del padding para que no se muevan raro)
+            // Controles de zoom (Fuera del bloque anterior para evitar saltos)
             Obx(
               () => AnimatedPositioned(
                 duration: const Duration(milliseconds: 600),
@@ -66,7 +65,7 @@ class HomeScreen extends GetView<HomeController> {
 
             _buildSideNavigation(context),
 
-            // Lógica del Panel de detalles (Tu código original)
+            // Lógica del Panel de detalles
             Obx(() {
               final isOpen = controller.isPanelOpen.value;
               final area = controller.visibleArea.value;
@@ -80,7 +79,9 @@ class HomeScreen extends GetView<HomeController> {
                         height: Get.height,
                         decoration: const BoxDecoration(
                           color: Colors.white,
-                          borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
+                          borderRadius: BorderRadius.vertical(
+                            top: Radius.circular(30),
+                          ),
                         ),
                         child: DetallesAreaScreen(area: area),
                       ),
@@ -108,7 +109,10 @@ class HomeScreen extends GetView<HomeController> {
                     final tc = controller.transformationController;
                     final matrix = tc.value.clone();
                     final scale = matrix.getMaxScaleOnAxis();
-                    matrix.translate(details.delta.dx / scale, details.delta.dy / scale);
+                    matrix.translate(
+                      details.delta.dx / scale,
+                      details.delta.dy / scale,
+                    );
                     tc.value = matrix;
                   },
                   behavior: HitTestBehavior.translucent,
@@ -143,6 +147,7 @@ class HomeScreen extends GetView<HomeController> {
       ),
     );
   }
+
   Widget _buildZoomControls() {
     return Column(
       children: [
