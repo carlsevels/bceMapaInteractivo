@@ -20,8 +20,6 @@ class HomeScreen extends GetView<HomeController> {
       body: SafeArea(
         child: Stack(
           children: [
-            // CAMBIO TÉCNICO: Usamos AnimatedContainer con margin.
-            // El margin hace lo mismo que el padding, pero no rompe los Positioned hijos en Web.
             Obx(
               () => AnimatedContainer(
                 duration: const Duration(milliseconds: 50),
@@ -52,7 +50,6 @@ class HomeScreen extends GetView<HomeController> {
               ),
             ),
 
-            // Controles de zoom (Fuera del bloque anterior para evitar saltos)
             Obx(
               () => AnimatedPositioned(
                 duration: const Duration(milliseconds: 600),

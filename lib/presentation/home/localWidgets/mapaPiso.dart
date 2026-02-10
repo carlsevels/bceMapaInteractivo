@@ -3,11 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:mapa_interactivo/infrastructure/models/area.dart';
 import 'package:vector_math/vector_math_64.dart' as vmath;
 
-import 'dart:math';
-import 'package:flutter/material.dart';
-import 'package:mapa_interactivo/infrastructure/models/area.dart';
-import 'package:vector_math/vector_math_64.dart' as vmath;
-
 class MapaPiso extends StatelessWidget {
   final String image;
   final List<Area> areas;
@@ -57,7 +52,7 @@ class MapaPiso extends StatelessWidget {
 
         return Stack(
           children: [
-            // CAPA 1: Imagen y Marcadores
+            // CAPA 1: Imagen y Marcadores (Dentro del InteractiveViewer)
             InteractiveViewer(
               transformationController: transformationController,
               constrained: false,
@@ -73,6 +68,7 @@ class MapaPiso extends StatelessWidget {
                         _removeAccents(area.nombre)
                             .contains(_removeAccents(currentQuery));
 
+                    // Los marcadores son hijos DIRECTOS de este Stack interno
                     return Positioned(
                       left: area.x,
                       top: area.y,
@@ -90,7 +86,7 @@ class MapaPiso extends StatelessWidget {
               ),
             ),
 
-            // CAPA 2: Indicador "ESTÁS AQUÍ"
+            // CAPA 2: Indicador flotante "ESTÁS AQUÍ" corregido
             AnimatedBuilder(
               animation: transformationController,
               builder: (context, child) {
@@ -124,7 +120,8 @@ class MapaPiso extends StatelessWidget {
                 final double arrowY = posInScreen.y.clamp(limitTop, size.height - margin);
                 final double angle = atan2(posInScreen.y - arrowY, posInScreen.x - arrowX);
 
-                return Positioned( // Cambiado a Positioned simple para evitar conflictos de ParentData
+                // El Positioned debe estar AQUÍ, como retorno del builder
+                return Positioned(
                   left: arrowX - 25,
                   top: arrowY - 25,
                   child: IgnorePointer(
@@ -160,8 +157,6 @@ class MapaPiso extends StatelessWidget {
   }
 }
 
-// (La clase _PulseMarker se mantiene igual que la tienes)
-// Marcador con animación de pulso
 class _PulseMarker extends StatefulWidget {
   final String nombre;
   final bool isHighlighted;
@@ -177,8 +172,7 @@ class _PulseMarker extends StatefulWidget {
   State<_PulseMarker> createState() => _PulseMarkerState();
 }
 
-class _PulseMarkerState extends State<_PulseMarker>
-    with SingleTickerProviderStateMixin {
+class _PulseMarkerState extends State<_PulseMarker> with SingleTickerProviderStateMixin {
   late AnimationController _controller;
 
   @override
