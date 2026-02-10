@@ -10,7 +10,7 @@ class HomeScreen extends GetView<HomeController> {
     Get.put(HomeController());
   }
 
-  @override
+@override
   Widget build(BuildContext context) {
     final bool isMobile = MediaQuery.of(context).size.width < 600;
 
@@ -20,43 +20,40 @@ class HomeScreen extends GetView<HomeController> {
       body: SafeArea(
         child: Stack(
           children: [
-            // CAPA 1: MAPA Y FILTROS FLOTANTES
-            // Reemplazamos AnimatedPadding por AnimatedPositioned para evitar errores de ParentData en Web
+            // Mantenemos tu AnimatedPadding para que el mapa ocupe todo el espacio
             Obx(
-              () => AnimatedPositioned(
-                duration: const Duration(milliseconds: 200),
+              () => AnimatedPadding(
+                duration: const Duration(milliseconds: 50),
                 curve: Curves.easeOut,
-                top: 0,
-                bottom: 0,
-                left: controller.menuWidth.value,
-                right: 0,
-                child: Stack(
-                  children: [
-                    MapaPiso(
-                      key: ValueKey(controller.pisoActual.value),
-                      image: 'assets/piso_${controller.pisoActual.value}.png',
-                      areas:
-                          controller.pisos[controller.pisoActual.value] ?? [],
-                      currentQuery: controller.query.value,
-                      selectedCategory: controller.categoriaSeleccionada.value,
-                      missionStep: controller.missionStep.value,
-                      onAreaTap: controller.onAreaSelected,
-                      transformationController:
-                          controller.transformationController,
-                      paddingRight: controller.isPanelOpen.value ? 495 : 60,
-                      paddingTop: 150,
-                    ),
-                    _buildCategoryFilterBar(isMobile),
-                    _buildFloatingFloorIndicator(isMobile),
-                  ],
+                padding: EdgeInsets.only(
+                  left: controller.menuWidth.value,
+                  right: 0,
+                ),
+                child: SizedBox.expand( // Agregamos esto para forzar el tamaño
+                  child: Stack(
+                    children: [
+                      MapaPiso(
+                        key: ValueKey(controller.pisoActual.value),
+                        image: 'assets/piso_${controller.pisoActual.value}.png',
+                        areas: controller.pisos[controller.pisoActual.value] ?? [],
+                        currentQuery: controller.query.value,
+                        selectedCategory: controller.categoriaSeleccionada.value,
+                        missionStep: controller.missionStep.value,
+                        onAreaTap: controller.onAreaSelected,
+                        transformationController: controller.transformationController,
+                        paddingRight: controller.isPanelOpen.value ? 495 : 60,
+                        paddingTop: 150,
+                      ),
+                      _buildCategoryFilterBar(isMobile),
+                      _buildFloatingFloorIndicator(isMobile),
+                      _buildFloatingMenuButton(),
+                    ],
+                  ),
                 ),
               ),
             ),
 
-            // CAPA 2: BOTÓN DE MENÚ (Debe estar fuera del AnimatedPositioned anterior)
-            _buildFloatingMenuButton(),
-
-            // CAPA 3: CONTROLES DE ZOOM
+            // Controles de zoom (Fuera del padding para que no se muevan raro)
             Obx(
               () => AnimatedPositioned(
                 duration: const Duration(milliseconds: 600),
@@ -67,10 +64,9 @@ class HomeScreen extends GetView<HomeController> {
               ),
             ),
 
-            // CAPA 4: NAVEGACIÓN LATERAL
             _buildSideNavigation(context),
 
-            // CAPA 5: PANEL DE DETALLES (Lógica Obx para Mobile y Desktop)
+            // Lógica del Panel de detalles (Tu código original)
             Obx(() {
               final isOpen = controller.isPanelOpen.value;
               final area = controller.visibleArea.value;
@@ -84,9 +80,7 @@ class HomeScreen extends GetView<HomeController> {
                         height: Get.height,
                         decoration: const BoxDecoration(
                           color: Colors.white,
-                          borderRadius: BorderRadius.vertical(
-                            top: Radius.circular(30),
-                          ),
+                          borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
                         ),
                         child: DetallesAreaScreen(area: area),
                       ),
@@ -114,10 +108,7 @@ class HomeScreen extends GetView<HomeController> {
                     final tc = controller.transformationController;
                     final matrix = tc.value.clone();
                     final scale = matrix.getMaxScaleOnAxis();
-                    matrix.translate(
-                      details.delta.dx / scale,
-                      details.delta.dy / scale,
-                    );
+                    matrix.translate(details.delta.dx / scale, details.delta.dy / scale);
                     tc.value = matrix;
                   },
                   behavior: HitTestBehavior.translucent,
@@ -146,14 +137,12 @@ class HomeScreen extends GetView<HomeController> {
               );
             }),
 
-            // CAPA 6: BANNER DE MISIÓN
             _buildMissionBanner(),
           ],
         ),
       ),
     );
   }
-
   Widget _buildZoomControls() {
     return Column(
       children: [
@@ -774,7 +763,7 @@ class HomeScreen extends GetView<HomeController> {
   }
 
   Widget _buildFloatingFloorIndicator(bool isMobile) => Positioned(
-    top: 20,
+    top: 20, // Ajusta esta altura a tu gusto
     left: 20,
     right: 20,
     child: Row(
@@ -814,7 +803,6 @@ class HomeScreen extends GetView<HomeController> {
       ],
     ),
   );
-
   Widget _buildFloatingMenuButton() {
     return Positioned(
       bottom: 30,
