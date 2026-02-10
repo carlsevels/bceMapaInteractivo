@@ -12,7 +12,7 @@ class MapaPiso extends StatelessWidget {
   final Function(Area) onAreaTap;
   final TransformationController transformationController;
   final double paddingRight;
-  final double paddingTop; // 🔹 Nuevo parámetro
+  final double paddingTop;
 
   const MapaPiso({
     Key? key,
@@ -86,7 +86,6 @@ class MapaPiso extends StatelessWidget {
               ),
             ),
 
-            // 🔹 FLECHA DINÁMICA CON PADDING SUPERIOR Y DERECHO
             AnimatedBuilder(
               animation: transformationController,
               builder: (context, child) {
@@ -97,7 +96,7 @@ class MapaPiso extends StatelessWidget {
                     descripcion: '',
                     x: -1000,
                     y: -1000,
-                    horario: '',
+                    horario: [],
                     servicios: [],
                     reglas: [],
                     galeria: [],
@@ -115,13 +114,12 @@ class MapaPiso extends StatelessWidget {
 
                 const double margin = 60.0;
                 final double limitRight = size.width - paddingRight;
-                final double limitTop =
-                    paddingTop; // 🔹 Límite superior dinámico
+                final double limitTop = paddingTop;
 
                 bool isOutside =
                     posInScreen.x < margin ||
                     posInScreen.x > limitRight ||
-                    posInScreen.y < limitTop || // 🔹 Ajuste aquí
+                    posInScreen.y < limitTop ||
                     posInScreen.y > size.height - margin;
 
                 if (!isOutside) return const SizedBox.shrink();

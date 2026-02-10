@@ -1,10 +1,13 @@
-  import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:mapa_interactivo/infrastructure/models/area.dart';
 import 'package:mapa_interactivo/presentation/detallesArea/localWidgets/mostrarDialogoQR.dart';
 import 'package:mapa_interactivo/presentation/detallesArea/localWidgets/titleContact.dart';
-
+// 🔹 CORRECCIÓN EN EL ARCHIVO DE abrirMenuContacto
 void abrirMenuContacto(Area area) {
+    const String telefono = "81 2020 9239";
+    const String correo = "redestataldebibliotecasnl@gob.com";
+
     Get.bottomSheet(
       Container(
         padding: const EdgeInsets.all(24),
@@ -23,21 +26,27 @@ void abrirMenuContacto(Area area) {
             titleContact(
               icon: Icons.phone,
               title: "WhatsApp",
-              value: "9283838382",
+              value: telefono,
               color: const Color(0xFF25D366),
-              onTap: () => mostrarDialogoQR(area, tipo: "WhatsApp"),
+              onTap: () {
+                Get.back(); 
+                mostrarDialogoQR(area, tipo: "WhatsApp");
+              },
             ),
             const SizedBox(height: 12),
             titleContact(
               icon: Icons.alternate_email_rounded,
               title: "Correo Electrónico",
-              value: "redestataldebibliotecasnl@gob.com",
+              value: correo,
               color: Colors.orange,
-              onTap: () => mostrarDialogoQR(area, tipo: "Correo"),
+              onTap: () {
+                Get.back();
+                mostrarDialogoQR(area, tipo: "Correo");
+              },
             ),
             const SizedBox(height: 20),
           ],
         ),
       ),
     );
-  }
+}

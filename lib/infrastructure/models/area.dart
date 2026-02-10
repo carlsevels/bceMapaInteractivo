@@ -3,17 +3,20 @@ class Area {
   final String descripcion;
   final double x;
   final double y;
-  final String horario;
+  final List<String> horario;
   final List<String> servicios;
-  final List<String> reglas;
+  final List<String>? reglas;
   final List<String> galeria;
-  final List<String> palabrasClave; // 🔹 NUEVO
+  final List<String> palabrasClave;
 
   final bool? sePuedeRentar;
   final String? infoRenta;
   final int? piso;
   final String categoria;
-  final bool esUbicacionActual; // 🔹 Punto "Usted está aquí"
+  final bool esUbicacionActual;
+
+  // 🔹 Nueva propiedad para la imagen de reglamentos
+  final String? imagenReglamento;
 
   Area({
     required this.nombre,
@@ -22,22 +25,24 @@ class Area {
     required this.y,
     required this.horario,
     required this.servicios,
-    required this.reglas,
+    this.reglas,
     required this.galeria,
     required this.categoria,
-    required this.palabrasClave, // 🔹 requerido
+    required this.palabrasClave,
     this.esUbicacionActual = false,
     this.sePuedeRentar,
     this.infoRenta,
     this.piso,
+    this.imagenReglamento, // Añadido al constructor
   });
 
-  /// 🔹 ACTUALIZADO CON PALABRAS CLAVE
+  /// 🔹 ACTUALIZADO CON IMAGEN DE REGLAMENTO Y PALABRAS CLAVE
   Area copyWith({
     int? piso,
     String? categoria,
     bool? esUbicacionActual,
     List<String>? palabrasClave,
+    String? imagenReglamento, // Añadido al copyWith
   }) {
     return Area(
       nombre: nombre,
@@ -54,6 +59,7 @@ class Area {
       piso: piso ?? this.piso,
       esUbicacionActual: esUbicacionActual ?? this.esUbicacionActual,
       palabrasClave: palabrasClave ?? this.palabrasClave,
+      imagenReglamento: imagenReglamento ?? this.imagenReglamento,
     );
   }
 }

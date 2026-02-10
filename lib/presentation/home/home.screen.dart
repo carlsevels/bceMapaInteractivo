@@ -776,10 +776,13 @@ class HomeScreen extends GetView<HomeController> {
     padding: const EdgeInsets.only(left: 20, right: 20, top: 8),
     child: Positioned(
       child: Row(
-        mainAxisAlignment: isMobil ? MainAxisAlignment.spaceBetween :  MainAxisAlignment.start,
+        mainAxisAlignment: isMobil
+            ? MainAxisAlignment.spaceBetween
+            : MainAxisAlignment.start,
         children: [
-          isMobil ? 
-          SizedBox(width: 50, child: Image.asset("assets/logos/bce2.png")) : SizedBox.shrink(),
+          isMobil
+              ? SizedBox(width: 50, child: Image.asset("assets/logos/bce2.png"))
+              : SizedBox.shrink(),
           ClipRRect(
             borderRadius: BorderRadius.circular(16),
             child: BackdropFilter(
@@ -817,14 +820,12 @@ class HomeScreen extends GetView<HomeController> {
       bottom: 30,
       left: 30,
       child: Obx(() {
-        // Bloqueamos el botón si el tutorial está en pasos intermedios
         bool tutorialActivo =
             controller.missionStep.value > 0 &&
             controller.missionStep.value < 4;
 
         double currentWidth = controller.menuWidth.value;
 
-        // Definimos los estados para el texto del botón
         bool isFull = currentWidth > 200;
         bool isMini = currentWidth >= 10 && currentWidth <= 200;
         bool isClosed = currentWidth < 10;
@@ -841,15 +842,14 @@ class HomeScreen extends GetView<HomeController> {
             onPressed: tutorialActivo
                 ? null
                 : () {
-                    // Lógica de ciclo: Cerrado -> Completo -> Mini -> Cerrado
                     if (isClosed) {
                       controller.menuWidth.value = 320;
                       controller.isMenuOpen.value = true;
                     } else if (isFull) {
-                      controller.menuWidth.value = 80; // Cambia a modo P1/P2
+                      controller.menuWidth.value = 80;
                       controller.isMenuOpen.value = true;
                     } else {
-                      controller.menuWidth.value = 0; // Cierra completamente
+                      controller.menuWidth.value = 0;
                       controller.isMenuOpen.value = false;
                     }
                   },

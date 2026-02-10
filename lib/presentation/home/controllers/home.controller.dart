@@ -13,9 +13,8 @@ class HomeController extends GetxController {
   final RxString query = ''.obs;
   final RxList<Area> sugerencias = <Area>[].obs;
   final RxString categoriaSeleccionada = ''.obs;
-  var menuWidth = 320.0.obs; // ancho inicial
+  var menuWidth = 320.0.obs;
   var isDragging = false.obs;
-  // 🔹 CONTROL DE ZOOM
   final RxInt zoomLevel = 0.obs;
   final int maxZoomClicks = 5;
   final TransformationController transformationController =
@@ -28,10 +27,10 @@ class HomeController extends GetxController {
         x: 820,
         y: 700,
         categoria: 'Información',
-        descripcion: 'Punto principal de orientación para visitantes.',
-        horario: 'Lunes a Viernes · 9:00 AM – 8:00 PM',
+        descripcion:
+            '''Este espacio es el primer contacto al entrar a la Biblioteca Central del Estado, en este lugar se da orientación a lo que necesite el usuario que entra a la biblioteca, además el personal que se encuentra en el módulo realiza el trámite de credencialización de los usuarios, lo cual les permite hacer préstamo de libros, y de igual manera en este espacio se realiza el proceso de préstamo, devolución y renovación de libros y material bibliográfico, por lo tanto se cuenta con equipos de cómputo para dichos tramites y un espacio pequeño para alojar el material bibliográfico (libros) que se devuelven.''',
+        horario: ['Lunes a Viernes · 8:30 AM - 8:30 PM'],
         servicios: ['Orientación', 'Apoyo catálogo'],
-        reglas: ['Formar fila', 'No alimentos'],
         galeria: ['assets/modulo/imagen1.jpeg', 'assets/modulo/imagen2.jpeg'],
         palabrasClave: [
           'informacion',
@@ -75,9 +74,11 @@ class HomeController extends GetxController {
         y: 730,
         categoria: 'Inclusión',
         descripcion: 'Acceso equitativo a la información.',
-        horario: 'Lunes a Sábado · 9:00 AM – 7:00 PM',
+        horario: [
+          'Lunes a Viernes · 8:30 AM - 8:30 PM',
+          'Sábado · 9:00 AM - 02:00 PM',
+        ],
         servicios: ['Braille', 'Audiolibros'],
-        reglas: ['Prioridad discapacidad'],
         galeria: [
           'assets/inclusion/imagen1.jpeg',
           'assets/inclusion/imagen2.jpeg',
@@ -117,9 +118,11 @@ class HomeController extends GetxController {
         y: 780,
         categoria: 'Cultura',
         descripcion: 'Actividades culturales y talleres.',
-        horario: 'Según programación',
+        horario: [
+          'Lunes a Viernes · 8:30 AM - 8:30 PM',
+          'Sábado · 9:00 AM - 02:00 PM',
+        ],
         servicios: ['Talleres', 'Conferencias'],
-        reglas: ['Acceso con eventos'],
         galeria: [
           'assets/multiproposito/imagen1.jpeg',
           'assets/multiproposito/imagen2.jpeg',
@@ -155,9 +158,11 @@ class HomeController extends GetxController {
         y: 850,
         categoria: 'Estudio',
         descripcion: 'Reuniones de trabajo y académicas.',
-        horario: 'Lunes a Viernes · 10:00 AM – 6:00 PM',
+        horario: [
+          'Lunes a Viernes · 08:30 AM - 8:30 PM',
+          'Sabados · 09:00 AM - 02:00 PM',
+        ],
         servicios: ['Reservación'],
-        reglas: ['No alimentos'],
         galeria: ['assets/salaDeJuntas/imagen1.jpeg'],
         palabrasClave: [
           'sala de juntas',
@@ -187,10 +192,13 @@ class HomeController extends GetxController {
         x: 620,
         y: 920,
         categoria: 'Alimentos',
-        descripcion: 'Consumo de alimentos y bebidas.',
-        horario: '8:30 AM – 7:30 PM',
+        descripcion:
+            '''En esta área se realizan lo catering o coffebreak en las ocasiones que se tienen eventos en nuestra biblioteca como presentaciones de libros o eventos especiales, de igual manera también tiene la función como el comedor de los trabajadores y personal de Servicio Social de la Biblioteca Central, así como también de usuarios que lleguen a requerirlo.''',
+        horario: [
+          'Lunes a Viernes · 8:30 AM - 8:30 PM',
+          'Sabados · 09:00 AM - 02:00 PM',
+        ],
         servicios: ['Venta alimentos'],
-        reglas: ['Limpieza'],
         galeria: [],
         palabrasClave: [
           'cafeteria',
@@ -221,10 +229,13 @@ class HomeController extends GetxController {
         x: 970,
         y: 170,
         categoria: 'Cultura',
-        descripcion: 'Patrimonio histórico de Nuevo León.',
-        horario: 'Martes a Domingo · 10:00 AM – 6:00 PM',
+        descripcion:
+            '''Un espacio de gran valor tanto nuestra biblioteca como para la comunidad Nuevoleonesa, esta área cuenta con una colección muy amplia y variada de títulos especializados en historia de estado, cada uno de los municipios o temáticas específicas de la región como: historia de los barrios, calles, flora y fauna de la región, comida norestense, platillos tipos de nuevo león, etc., la sala de fondo Nuevo León es comúnmente visitada por historiadores del estado para complementar investigaciones, además que esta este espacio se realizan círculos de lectura al igual de charlas y presentaciones relacionados a los temas de nuestro estado.''',
+        horario: [
+          'Lunes a Viernes · 08:30 AM - 08:30 PM',
+          'Sabados · 09:00 AM - 02:00 PM',
+        ],
         servicios: ['Exposiciones'],
-        reglas: ['No tocar'],
         galeria: [
           'assets/legadoNL/imagen1.jpeg',
           'assets/legadoNL/imagen2.jpeg',
@@ -255,10 +266,13 @@ class HomeController extends GetxController {
         x: 200,
         y: 200,
         categoria: 'Cultura',
-        descripcion: 'Patrimonio histórico de Nuevo León.',
-        horario: 'Martes a Domingo · 10:00 AM – 6:00 PM',
+        descripcion:
+            '''La sala general es el espacio de lectura predilecto para los usuarios que nos visitan, cuenta con un gran espacio de lectura y mobiliario para trabajo y estudio, además de tener una gran vista a la macroplaza gracias al ventanal que acompaña la sala, este espacio cuenta con la colección de general de libros que abarca los siguientes temas: historia, novelas, leyendas, literatura clásica y contemporánea, geografía, psicología, educación, religión y bellas artes; en este espacio los bibliotecarios comúnmente planean tertulias literarias además de charlas de diversos temas a tratar que llevan como nombre distintivo “Sociedad del Conocimiento”, el área presenta mobiliario suficiente para que un gran número de usuarios pueda permanecer en la sala con las mejores condiciones, esta sala cuenta en su espacio la segunda parte de todo el acervo con el que cuenta la Biblioteca Central del Estado.''',
+        horario: [
+          'Lunes a Viernes · 08:30 AM - 08:30 PM',
+          'Sabados · 09:00 AM - 02:00 PM',
+        ],
         servicios: ['Exposiciones'],
-        reglas: ['No tocar'],
         galeria: [
           'assets/acervo/imagen1.jpeg',
           'assets/acervo/imagen2.jpeg',
@@ -291,9 +305,11 @@ class HomeController extends GetxController {
         y: 70,
         categoria: 'Estudio',
         descripcion: 'Espacios individuales de estudio.',
-        horario: 'Martes a Domingo · 10:00 AM – 6:00 PM',
+        horario: [
+          'Lunes a Viernes · 08:30 AM - 08:30 PM',
+          'Sabados · 09:00 AM - 02:00 PM',
+        ],
         servicios: ['Estudio individual'],
-        reglas: ['Silencio'],
         galeria: [
           'assets/cubiculos/imagen1.jpeg',
           'assets/cubiculos/imagen2.jpeg',
@@ -320,11 +336,14 @@ class HomeController extends GetxController {
         nombre: 'MEZZANINE',
         x: 820,
         y: 340,
-        categoria: 'Estudio',
+        categoria:
+            '''Espacio de gran amplitud, en este lugar de la biblioteca se desarrollan la gran parte de eventos que se planean en nuestra biblioteca, es espacio sirve como área de exhibición de obras plásticas, demostraciones teatrales y musicales, así como presentación de libros, tertulias o lecturas en voz alta, además de ser el espacio que alberga el mural que engalana nuestra biblioteca.''',
         descripcion: 'Área abierta de estudio.',
-        horario: 'Martes a Domingo · 10:00 AM – 6:00 PM',
+        horario: [
+          'Lunes a Viernes · 8:30 AM - 8:30 PM',
+          'Sábado · 9:00 AM - 02:00 PM',
+        ],
         servicios: ['Lectura'],
-        reglas: ['Silencio'],
         galeria: [
           'assets/mezzanine/imagen1.jpeg',
           'assets/mezzanine/imagen2.jpeg',
@@ -353,10 +372,12 @@ class HomeController extends GetxController {
         y: 160,
         categoria: 'Ubicación',
         descripcion: 'Te encuentras en el punto de consulta del segundo piso.',
-        horario: 'Disponible 24/7',
+        horario: [
+          'Lunes a Viernes · 8:30 AM - 8:30 PM',
+          'Sábado · 9:00 AM - 02:00 PM',
+        ],
         esUbicacionActual: false,
         servicios: ['Mapa interactivo', 'Búsqueda de libros'],
-        reglas: ['Uso preferente para visitantes'],
         galeria: [],
         palabrasClave: [
           'ubicacion',
@@ -386,15 +407,18 @@ class HomeController extends GetxController {
         y: 120,
         categoria: 'Estudio',
         descripcion: 'Espacio tranquilo...',
-        horario: '9:00 AM – 8:00 PM',
+        horario: [
+          'Lunes a Viernes · 8:30 AM - 05:00 PM',
+          'Sábado · 9:00 AM - 02:00 PM',
+        ],
         servicios: ['Mesas'],
-        reglas: ['Silencio'],
         galeria: [
           'assets/salaJuvenil/imagen1.jpeg',
           'assets/salaJuvenil/imagen2.jpeg',
           'assets/salaJuvenil/imagen3.jpeg',
           'assets/salaJuvenil/imagen4.jpeg',
         ],
+        imagenReglamento: 'assets/reglamentos/salaJuvenil.png',
         palabrasClave: [
           'juvenil',
           'jóvenes',
@@ -416,10 +440,13 @@ class HomeController extends GetxController {
         x: 150,
         y: 140,
         categoria: 'Cultura',
-        descripcion: 'Espacio amplio destinado a conferencias y eventos.',
-        horario: '9:00 AM – 8:00 PM',
+        descripcion:
+            '''Es un bello espacio utilizado para diversas presentaciones y proyecciones, el área cuenta con sistema de sonido propio, también cuenta con una cabina de sonido la cual es equipada por una consola/ mezcladora para operar el sonido del auditorio y ahí mismo se encuentra un centro de carga independiente con el cual se controla la iluminación y corriente eléctrica del espacio total, el espacio también cuenta con un proyector para proyección si es necesario, en nuestro auditorio también se realizan actividades como presentaciones teatrales, recitales musicales y cabe mencionar que al ser un espacio público el auditorio puede llegar a ser solicitado por diversos usuarios para varios fines, entre los cuales están: ciclos de cine, reuniones de equipos de trabajo e incluso llega a ser solicitado por dependencias de gobierno para reuniones como: licitaciones, reuniones de jubilados, juntas informativas y charlas o talleres de formación continua.''',
+        horario: [
+          'Lunes a Viernes · 8:30 AM - 08:30 PM',
+          'Sábado · 9:00 AM - 02:00 PM',
+        ],
         servicios: ['Escenario', 'Sonido'],
-        reglas: ['No alimentos'],
         galeria: [
           'assets/auditorio/imagen1.jpeg',
           'assets/auditorio/imagen2.jpeg',
@@ -450,9 +477,11 @@ class HomeController extends GetxController {
         y: 170,
         categoria: 'Cultura',
         descripcion: 'Colección de cómics y novelas gráficas.',
-        horario: '9:00 AM – 8:00 PM',
+        horario: [
+          'Lunes a Viernes · 8:30 AM - 06:00 PM',
+          'Sábado · 9:00 AM - 02:00 PM',
+        ],
         servicios: ['Lectura'],
-        reglas: ['Cuidar materiales'],
         galeria: [
           'assets/comicteca/imagen1.jpeg',
           'assets/comicteca/imagen2.jpeg',
@@ -480,15 +509,19 @@ class HomeController extends GetxController {
         x: 350,
         y: 750,
         categoria: 'Infantil',
-        descripcion: 'Área para los más pequeños.',
-        horario: '9:00 AM – 8:00 PM',
+        descripcion:
+            '''Espacio dedicado a los niños y niñas de edades de 0 meses a 6 años, está área cuenta con materiales de lectura adecuado a las edades mencionadas, así como mobiliario y tatamis en el suelo que hacen la sala más amigable para los niños y niñas quela visitan, además en este espacio se imparte el taller de “Primera Infancia” que es en colaboración con la Secretaria de Cultura.''',
+        horario: [
+          'Lunes a Viernes · 8:30 AM - 05:00 PM',
+          'Sábado · 9:00 AM - 02:00 PM',
+        ],
         servicios: ['Juegos didácticos'],
-        reglas: ['Supervisión adultos'],
         galeria: [
           'assets/primeraInfancia/imagen1.jpeg',
           'assets/primeraInfancia/imagen2.jpeg',
           'assets/primeraInfancia/imagen3.jpeg',
         ],
+        imagenReglamento: "assets/reglamentos/salaInfancias.png",
         palabrasClave: [
           'bebes',
           'bebés',
@@ -510,15 +543,18 @@ class HomeController extends GetxController {
         y: 850,
         categoria: 'Infantil',
         descripcion: 'Proyecciones y cuentacuentos.',
-        horario: '9:00 AM – 8:00 PM',
+        horario: [
+          'Lunes a Viernes · 8:30 AM - 05:00 PM',
+          'Sábado · 9:00 AM - 02:00 PM',
+        ],
         servicios: ['Cine'],
-        reglas: ['Orden'],
         galeria: [
           'assets/cineInfantil/imagen1.jpeg',
           'assets/cineInfantil/imagen2.jpeg',
           'assets/cineInfantil/imagen3.jpeg',
           'assets/cineInfantil/imagen4.jpeg',
         ],
+        imagenReglamento: "assets/reglamentos/salaInfancias.png",
         palabrasClave: [
           'cine',
           'peliculas',
@@ -538,11 +574,14 @@ class HomeController extends GetxController {
         nombre: 'Ludoteca',
         x: 580,
         y: 960,
+        imagenReglamento: "assets/reglamentos/salaInfancias.png",
         categoria: 'Infantil',
         descripcion: 'Espacio de juegos.',
-        horario: '9:00 AM – 8:00 PM',
+        horario: [
+          'Lunes a Viernes · 8:30 AM - 05:00 PM',
+          'Sábado · 9:00 AM - 02:00 PM',
+        ],
         servicios: ['Juguetes'],
-        reglas: ['Compartir'],
         galeria: [
           'assets/ludoteca/imagen1.jpeg',
           'assets/ludoteca/imagen2.jpeg',
@@ -569,15 +608,19 @@ class HomeController extends GetxController {
         x: 800,
         y: 650,
         categoria: 'Tecnología',
-        descripcion: 'Acceso a computadoras e internet.',
-        horario: '9:00 AM – 8:00 PM',
+        descripcion:
+            '''Es un área con una gran circulación de usuarios, en este espacio se da el servicio de préstamo de computadoras en la cuales se puede trabajar en los diversos programas de procesador de datos, así como navegar en internet y las diferentes plataformas de entretenimiento digital.''',
+        horario: [
+          'Lunes a Viernes · 8:30 AM - 06:00 PM',
+          'Sábado · 9:00 AM - 02:00 PM',
+        ],
         servicios: ['Internet'],
-        reglas: ['Tiempo limitado'],
         galeria: [
           'assets/multimedia/imagen1.jpeg',
           'assets/multimedia/imagen2.jpeg',
           'assets/multimedia/imagen3.jpeg',
         ],
+        imagenReglamento: "assets/reglamentos/multimedia.png",
         palabrasClave: [
           'computadoras',
           'computadora',
@@ -599,9 +642,11 @@ class HomeController extends GetxController {
         y: 930,
         categoria: 'Tecnología',
         descripcion: 'Experiencias inmersivas.',
-        horario: '9:00 AM – 8:00 PM',
+        horario: [
+          'Lunes a Viernes · 8:30 AM - 06:00 PM',
+          'Sábado · 9:00 AM - 02:00 PM',
+        ],
         servicios: ['Gafas VR'],
-        reglas: ['Uso responsable'],
         galeria: [
           'assets/realidadVirtual/imagen1.jpeg',
           'assets/realidadVirtual/imagen2.jpeg',
@@ -625,9 +670,8 @@ class HomeController extends GetxController {
         y: 820,
         categoria: 'Tecnología',
         descripcion: 'Laboratorio de fabricación digital.',
-        horario: '9:00 AM – 8:00 PM',
+        horario: ['Lunes a Viernes · 8:30 AM - 04:00 PM'],
         servicios: ['Modelado 3D'],
-        reglas: ['Costo material'],
         galeria: [],
         palabrasClave: [
           'impresion 3d',
@@ -648,9 +692,11 @@ class HomeController extends GetxController {
         y: 240,
         categoria: 'Tecnología',
         descripcion: 'Grabación de audio profesional.',
-        horario: '9:00 AM – 8:00 PM',
+        horario: [
+          'Lunes a Viernes · 8:30 AM - 05:00 PM',
+          'Sábado · 9:00 AM - 02:00 PM',
+        ],
         servicios: ['Grabación'],
-        reglas: ['Reservación'],
         galeria: [
           'assets/podcast/imagen1.jpeg',
           'assets/podcast/imagen2.jpeg',
@@ -678,12 +724,8 @@ class HomeController extends GetxController {
   void onInit() {
     super.onInit();
 
-    // 🔹 SINCRONIZACIÓN TOUCH/GESTOS -> zoomLevel
     transformationController.addListener(() {
       final double scale = transformationController.value.getMaxScaleOnAxis();
-
-      // Mapeamos la escala física al rango de zoomLevel (-5 a 5)
-      // Ajustado para que scale 2.5 sea nivel 5 y scale 0.4 sea nivel -5
       if (scale > 1.0) {
         zoomLevel.value = ((scale - 1.0) / (2.5 - 1.0) * maxZoomClicks)
             .round()
