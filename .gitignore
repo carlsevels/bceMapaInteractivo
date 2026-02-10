@@ -1,34 +1,52 @@
 # ------------------------------
-# Flutter / Dart
+# Flutter / Dart (Compilación y paquetes)
 # ------------------------------
 .dart_tool/
 .packages
 .pub-cache/
 .pub/
 build/
+# Archivos de metadatos de Flutter
 .flutter-plugins
 .flutter-plugins-dependencies
+.metadata
 
 # ------------------------------
-# IDEs
+# Archivos de Firebase
+# ------------------------------
+# Ignora archivos de estado de Firebase pero NO el firebase.json
+.firebase/
+# Logs de errores de Firebase
+firebase-debug.log
+ui-debug.log
+
+# ------------------------------
+# IDEs (Configuraciones locales)
 # ------------------------------
 .idea/
 .vscode/
 *.iml
+*.ipr
+*.iws
+.history/
 
 # ------------------------------
-# macOS
+# Archivos del Sistema Operativo
 # ------------------------------
 .DS_Store
+Thumbs.db
 
 # ------------------------------
-# Android
+# Android (Secretos y Gradle)
 # ------------------------------
 android/.gradle/
 android/captures/
 android/local.properties
 android/key.properties
 *.jks
+*.keystore
+# Ignorar archivos generados de Flutter para Android
+android/flutter_plugin_android_libs/
 
 # ------------------------------
 # iOS / macOS
@@ -39,31 +57,24 @@ ios/Flutter/Flutter.framework
 ios/Flutter/Flutter.podspec
 ios/Flutter/App.framework
 ios/Flutter/Generated.xcconfig
+ios/Flutter/ephemeral/
 
 macos/Pods/
 macos/Flutter/ephemeral/
 macos/Flutter/GeneratedPluginRegistrant.swift
 
 # ------------------------------
-# Logs
+# Secretos y Entorno (¡Importante!)
+# ------------------------------
+.env
+.env.*
+# Opcional: Ignorar las opciones de Firebase si quieres configurar manualmente por entorno
+# firebase_options.dart
+
+# ------------------------------
+# Logs y Temporales
 # ------------------------------
 *.log
-
-# ------------------------------
-# Firebase / Secrets (si usas)
-# ------------------------------
-google-services.json
-GoogleService-Info.plist
-firebase_options.dart
-
-# ------------------------------
-# Coverage
-# ------------------------------
-coverage/
-
-# ------------------------------
-# Temp / cache
-# ------------------------------
 *.swp
 *.tmp
 *.temp
