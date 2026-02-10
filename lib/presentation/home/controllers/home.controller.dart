@@ -31,7 +31,7 @@ class HomeController extends GetxController {
             '''Este espacio es el primer contacto al entrar a la Biblioteca Central del Estado, en este lugar se da orientación a lo que necesite el usuario que entra a la biblioteca, además el personal que se encuentra en el módulo realiza el trámite de credencialización de los usuarios, lo cual les permite hacer préstamo de libros, y de igual manera en este espacio se realiza el proceso de préstamo, devolución y renovación de libros y material bibliográfico, por lo tanto se cuenta con equipos de cómputo para dichos tramites y un espacio pequeño para alojar el material bibliográfico (libros) que se devuelven.''',
         horario: ['Lunes a Viernes · 8:30 AM - 8:30 PM'],
         servicios: ['Orientación', 'Apoyo catálogo'],
-        galeria: ['modulo/imagen1.jpeg', 'modulo/imagen2.jpeg'],
+        galeria: ['assets/modulo/imagen1.jpeg', 'assets/modulo/imagen2.jpeg'],
         palabrasClave: [
           'informacion',
           'información',
@@ -124,8 +124,8 @@ class HomeController extends GetxController {
         ],
         servicios: ['Talleres', 'Conferencias'],
         galeria: [
-          'multiproposito/imagen1.jpeg',
-          'multiproposito/imagen2.jpeg',
+          'assets/multiproposito/imagen1.jpeg',
+          'assets/multiproposito/imagen2.jpeg',
         ],
         palabrasClave: [
           'sala',
@@ -163,7 +163,7 @@ class HomeController extends GetxController {
           'Sabados · 09:00 AM - 02:00 PM',
         ],
         servicios: ['Reservación'],
-        galeria: ['salaDeJuntas/imagen1.jpeg'],
+        galeria: ['assets/salaDeJuntas/imagen1.jpeg'],
         palabrasClave: [
           'sala de juntas',
           'juntas',
@@ -237,9 +237,9 @@ class HomeController extends GetxController {
         ],
         servicios: ['Exposiciones'],
         galeria: [
-          'legadoNL/imagen1.jpeg',
-          'legadoNL/imagen2.jpeg',
-          'legadoNL/imagen3.jpeg',
+          'assets/legadoNL/imagen1.jpeg',
+          'assets/legadoNL/imagen2.jpeg',
+          'assets/legadoNL/imagen3.jpeg',
         ],
         palabrasClave: [
           'legado',
@@ -274,10 +274,10 @@ class HomeController extends GetxController {
         ],
         servicios: ['Exposiciones'],
         galeria: [
-          'acervo/imagen1.jpeg',
-          'acervo/imagen2.jpeg',
-          'acervo/imagen3.jpeg',
-          'acervo/imagen4.jpeg',
+          'assets/acervo/imagen1.jpeg',
+          'assets/acervo/imagen2.jpeg',
+          'assets/acervo/imagen3.jpeg',
+          'assets/acervo/imagen4.jpeg',
         ],
         palabrasClave: [
           'acervo',
@@ -311,8 +311,8 @@ class HomeController extends GetxController {
         ],
         servicios: ['Estudio individual'],
         galeria: [
-          'cubiculos/imagen1.jpeg',
-          'cubiculos/imagen2.jpeg',
+          'assets/cubiculos/imagen1.jpeg',
+          'assets/cubiculos/imagen2.jpeg',
         ],
         palabrasClave: [
           'cubiculo',
@@ -345,8 +345,8 @@ class HomeController extends GetxController {
         ],
         servicios: ['Lectura'],
         galeria: [
-          'mezzanine/imagen1.jpeg',
-          'mezzanine/imagen2.jpeg',
+          'assets/mezzanine/imagen1.jpeg',
+          'assets/mezzanine/imagen2.jpeg',
         ],
         palabrasClave: [
           'mezzanine',
@@ -413,10 +413,10 @@ class HomeController extends GetxController {
         ],
         servicios: ['Mesas'],
         galeria: [
-          'salaJuvenil/imagen1.jpeg',
-          'salaJuvenil/imagen2.jpeg',
-          'salaJuvenil/imagen3.jpeg',
-          'salaJuvenil/imagen4.jpeg',
+          'assets/salaJuvenil/imagen1.jpeg',
+          'assets/salaJuvenil/imagen2.jpeg',
+          'assets/salaJuvenil/imagen3.jpeg',
+          'assets/salaJuvenil/imagen4.jpeg',
         ],
         imagenReglamento: 'assets/reglamentos/salaJuvenil.png',
         palabrasClave: [
@@ -448,10 +448,10 @@ class HomeController extends GetxController {
         ],
         servicios: ['Escenario', 'Sonido'],
         galeria: [
-          'auditorio/imagen1.jpeg',
-          'auditorio/imagen2.jpeg',
-          'auditorio/imagen3.jpeg',
-          'auditorio/imagen4.jpeg',
+          'assets/auditorio/imagen1.jpeg',
+          'assets/auditorio/imagen2.jpeg',
+          'assets/auditorio/imagen3.jpeg',
+          'assets/auditorio/imagen4.jpeg',
         ],
         sePuedeRentar: true,
         infoRenta: 'Solicitar vía correo con 2 semanas de anticipación.',
@@ -483,8 +483,8 @@ class HomeController extends GetxController {
         ],
         servicios: ['Lectura'],
         galeria: [
-          'comicteca/imagen1.jpeg',
-          'comicteca/imagen2.jpeg',
+          'assets/comicteca/imagen1.jpeg',
+          'assets/comicteca/imagen2.jpeg',
         ],
         palabrasClave: [
           'comicteca',
@@ -517,9 +517,9 @@ class HomeController extends GetxController {
         ],
         servicios: ['Juegos didácticos'],
         galeria: [
-          'primeraInfancia/imagen1.jpeg',
-          'primeraInfancia/imagen2.jpeg',
-          'primeraInfancia/imagen3.jpeg',
+          'assets/primeraInfancia/imagen1.jpeg',
+          'assets/primeraInfancia/imagen2.jpeg',
+          'assets/primeraInfancia/imagen3.jpeg',
         ],
         imagenReglamento: "assets/reglamentos/salaInfancias.png",
         palabrasClave: [
@@ -549,10 +549,10 @@ class HomeController extends GetxController {
         ],
         servicios: ['Cine'],
         galeria: [
-          'cineInfantil/imagen1.jpeg',
-          'cineInfantil/imagen2.jpeg',
-          'cineInfantil/imagen3.jpeg',
-          'cineInfantil/imagen4.jpeg',
+          'assets/cineInfantil/imagen1.jpeg',
+          'assets/cineInfantil/imagen2.jpeg',
+          'assets/cineInfantil/imagen3.jpeg',
+          'assets/cineInfantil/imagen4.jpeg',
         ],
         imagenReglamento: "assets/reglamentos/salaInfancias.png",
         palabrasClave: [
@@ -583,10 +583,10 @@ class HomeController extends GetxController {
         ],
         servicios: ['Juguetes'],
         galeria: [
-          'ludoteca/imagen1.jpeg',
-          'ludoteca/imagen2.jpeg',
-          'ludoteca/imagen3.jpeg',
-          'ludoteca/imagen4.jpeg',
+          'assets/ludoteca/imagen1.jpeg',
+          'assets/ludoteca/imagen2.jpeg',
+          'assets/ludoteca/imagen3.jpeg',
+          'assets/ludoteca/imagen4.jpeg',
         ],
         palabrasClave: [
           'ludoteca',
@@ -616,11 +616,11 @@ class HomeController extends GetxController {
         ],
         servicios: ['Internet'],
         galeria: [
-          'multimedia/imagen1.jpeg',
-          'multimedia/imagen2.jpeg',
-          'multimedia/imagen3.jpeg',
+          'assets/multimedia/imagen1.jpeg',
+          'assets/multimedia/imagen2.jpeg',
+          'assets/multimedia/imagen3.jpeg',
         ],
-        imagenReglamento: "assets/reglamentos/multimedia.png",
+        imagenReglamento: 'assets/reglamentos/multimedia.png',
         palabrasClave: [
           'computadoras',
           'computadora',
@@ -648,8 +648,8 @@ class HomeController extends GetxController {
         ],
         servicios: ['Gafas VR'],
         galeria: [
-          'realidadVirtual/imagen1.jpeg',
-          'realidadVirtual/imagen2.jpeg',
+          'assets/realidadVirtual/imagen1.jpeg',
+          'assets/realidadVirtual/imagen2.jpeg',
         ],
         palabrasClave: [
           'vr',
@@ -698,9 +698,9 @@ class HomeController extends GetxController {
         ],
         servicios: ['Grabación'],
         galeria: [
-          'podcast/imagen1.jpeg',
-          'podcast/imagen2.jpeg',
-          'podcast/imagen3.jpeg',
+          'assets/podcast/imagen1.jpeg',
+          'assets/podcast/imagen2.jpeg',
+          'assets/podcast/imagen3.jpeg',
         ],
         sePuedeRentar: true,
         palabrasClave: [

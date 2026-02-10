@@ -259,22 +259,9 @@ class DetallesAreaScreen extends StatelessWidget {
                             border: Border.all(color: Colors.grey.shade200),
                             borderRadius: BorderRadius.circular(12),
                           ),
-                          child: Image.network(
-                            area.imagenReglamento!,
-                            // 🔹 Quitamos la altura fija y usamos BoxFit.contain para verla completa
+                          child: Image.asset(
+                            area.imagenReglamento!, 
                             fit: BoxFit.contain,
-                            loadingBuilder: (context, child, loadingProgress) {
-                              if (loadingProgress == null) return child;
-                              return Container(
-                                height: 150,
-                                child: Center(
-                                  child: CircularProgressIndicator(
-                                    color: colorAccent,
-                                    strokeWidth: 2,
-                                  ),
-                                ),
-                              );
-                            },
                             errorBuilder: (context, error, stackTrace) =>
                                 Container(
                                   height: 100,
