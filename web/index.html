@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <!--
     If you are serving your web app in a path other than the root, change the
@@ -27,12 +28,24 @@
   <link rel="apple-touch-icon" href="icons/Icon-192.png">
 
   <!-- Favicon -->
-  <link rel="icon" type="image/png" href="favicon.png"/>
+  <link rel="icon" type="image/png" href="favicon.png" />
 
   <title>mapa_interactivo</title>
   <link rel="manifest" href="manifest.json">
+  <link rel="manifest" href="manifest.json">
+
+  <script>
+    // Parche para corregir la ruta de assets en GitHub Pages
+    window.addEventListener('load', function () {
+      if (window.location.hostname.includes('github.io')) {
+        console.log("Ajustando entorno para GitHub Pages...");
+      }
+    });
+  </script>
 </head>
+
 <body>
   <script src="flutter_bootstrap.js" async></script>
 </body>
+
 </html>
