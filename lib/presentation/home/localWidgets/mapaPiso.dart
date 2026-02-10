@@ -24,7 +24,7 @@ class MapaPiso extends StatelessWidget {
     required this.onAreaTap,
     required this.transformationController,
     this.paddingRight = 20.0,
-    this.paddingTop = 20.0, // 🔹 Valor por defecto
+    this.paddingTop = 20.0,
   }) : super(key: key);
 
   String _removeAccents(String text) {
@@ -52,6 +52,7 @@ class MapaPiso extends StatelessWidget {
 
         return Stack(
           children: [
+            // CAPA 1: El mapa interactivo y los marcadores
             InteractiveViewer(
               transformationController: transformationController,
               constrained: false,
@@ -63,11 +64,9 @@ class MapaPiso extends StatelessWidget {
                 children: [
                   Image.asset(image, fit: BoxFit.none),
                   ...visibleAreas.map((area) {
-                    final bool isHighlighted =
-                        currentQuery.isNotEmpty &&
-                        _removeAccents(
-                          area.nombre,
-                        ).contains(_removeAccents(currentQuery));
+                    final bool isHighlighted = currentQuery.isNotEmpty &&
+                        _removeAccents(area.nombre)
+                            .contains(_removeAccents(currentQuery));
 
                     return Positioned(
                       left: area.x,
@@ -86,6 +85,7 @@ class MapaPiso extends StatelessWidget {
               ),
             ),
 
+            // CAPA 2: Indicador de "Estás aquí" (Flecha fuera de pantalla)
             AnimatedBuilder(
               animation: transformationController,
               builder: (context, child) {
@@ -105,35 +105,35 @@ class MapaPiso extends StatelessWidget {
                   ),
                 );
 
+                // Si no hay usuario, ocultamos el widget
                 if (userLocation.x == -1000) return const SizedBox.shrink();
 
-                final vmath.Vector3 posInScreen = transformationController.value
-                    .transform3(
-                      vmath.Vector3(userLocation.x, userLocation.y, 0),
-                    );
+                final vmath.Vector3 posInScreen =
+                    transformationController.value.transform3(
+                  vmath.Vector3(userLocation.x, userLocation.y, 0),
+                );
 
                 const double margin = 60.0;
                 final double limitRight = size.width - paddingRight;
                 final double limitTop = paddingTop;
 
-                bool isOutside =
-                    posInScreen.x < margin ||
+                bool isOutside = posInScreen.x < margin ||
                     posInScreen.x > limitRight ||
                     posInScreen.y < limitTop ||
                     posInScreen.y > size.height - margin;
 
+                // Solo mostramos la flecha si el usuario está fuera del área visible
                 if (!isOutside) return const SizedBox.shrink();
 
                 final double arrowX = posInScreen.x.clamp(margin, limitRight);
-                final double arrowY = posInScreen.y.clamp(
-                  limitTop,
-                  size.height - margin,
-                );
+                final double arrowY =
+                    posInScreen.y.clamp(limitTop, size.height - margin);
                 final double angle = atan2(
                   posInScreen.y - arrowY,
                   posInScreen.x - arrowX,
                 );
 
+                // IMPORTANTE: AnimatedPositioned debe ser el retorno directo
                 return AnimatedPositioned(
                   duration: const Duration(milliseconds: 600),
                   curve: Curves.easeOutQuart,
@@ -185,6 +185,7 @@ class MapaPiso extends StatelessWidget {
   }
 }
 
+// Marcador con animación de pulso
 class _PulseMarker extends StatefulWidget {
   final String nombre;
   final bool isHighlighted;

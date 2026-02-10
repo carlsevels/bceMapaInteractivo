@@ -772,49 +772,47 @@ class HomeScreen extends GetView<HomeController> {
     );
   }
 
-  Widget _buildFloatingFloorIndicator(isMobil) => Padding(
-    padding: const EdgeInsets.only(left: 20, right: 20, top: 8),
-    child: Positioned(
-      child: Row(
-        mainAxisAlignment: isMobil
-            ? MainAxisAlignment.spaceBetween
-            : MainAxisAlignment.start,
-        children: [
-          isMobil
-              ? SizedBox(width: 50, child: Image.asset("logos/bce2.png"))
-              : SizedBox.shrink(),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(16),
-            child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
-              child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 10,
-                ),
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.85),
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: Colors.white.withOpacity(0.2)),
-                ),
-                child: Obx(
-                  () => Text(
-                    "PISO ${controller.pisoActual.value}",
-                    style: TextStyle(
-                      fontWeight: FontWeight.w900,
-                      color: Colors.cyan[900],
-                      letterSpacing: 1,
-                    ),
+  Widget _buildFloatingFloorIndicator(bool isMobile) => Positioned(
+    top: 20, // Ajusta esta altura a tu gusto
+    left: 20,
+    right: 20,
+    child: Row(
+      mainAxisAlignment: isMobile
+          ? MainAxisAlignment.spaceBetween
+          : MainAxisAlignment.start,
+      children: [
+        if (isMobile)
+          SizedBox(width: 50, child: Image.asset("logos/bce2.png"))
+        else
+          const SizedBox.shrink(),
+
+        ClipRRect(
+          borderRadius: BorderRadius.circular(16),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.85),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: Colors.white.withOpacity(0.2)),
+              ),
+              child: Obx(
+                () => Text(
+                  "PISO ${controller.pisoActual.value}",
+                  style: TextStyle(
+                    fontWeight: FontWeight.w900,
+                    color: Colors.cyan[900],
+                    letterSpacing: 1,
                   ),
                 ),
               ),
             ),
           ),
-        ],
-      ),
+        ),
+      ],
     ),
   );
-
   Widget _buildFloatingMenuButton() {
     return Positioned(
       bottom: 30,
