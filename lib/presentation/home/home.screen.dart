@@ -286,8 +286,8 @@ class HomeScreen extends GetView<HomeController> {
                           color: Colors.white.withOpacity(0.15),
                           borderRadius: BorderRadius.circular(isMini ? 12 : 22),
                         ),
-                        child: Image.asset(
-                          "assets/logos/bce2.png",
+                        child: Image.network(
+                          "https://carlsevels.github.io/bceMapaInteractivo/assets/assets/logos/bce2.png",
                           width: isMini ? 40 : 110,
                         ),
                       ),
