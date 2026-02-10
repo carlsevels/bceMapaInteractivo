@@ -287,7 +287,7 @@ class HomeScreen extends GetView<HomeController> {
                           borderRadius: BorderRadius.circular(isMini ? 12 : 22),
                         ),
                         child: Image.asset(
-                          "assets/logos/bce2.png",
+                          "assets/assets/logos/bce2.png",
                           width: isMini ? 40 : 110,
                         ),
                       ),
