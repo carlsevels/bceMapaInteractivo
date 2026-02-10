@@ -260,7 +260,7 @@ class DetallesAreaScreen extends StatelessWidget {
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: Image.asset(
-                            area.imagenReglamento!, 
+                            area.imagenReglamento!, // La ruta debe ser algo como 'assets/images/regla.png'
                             fit: BoxFit.contain,
                             errorBuilder: (context, error, stackTrace) =>
                                 Container(
@@ -333,11 +333,20 @@ class DetallesAreaScreen extends StatelessWidget {
                 panEnabled: true,
                 minScale: 0.5,
                 maxScale: 4.0,
-                child: Image.network(
-                  imageUrl,
+                // CAMBIO: Se usa Image.asset para archivos locales
+                child: Image.asset(
+                  imageUrl, // Asegúrate de que esta variable sea la ruta, ej: 'assets/mapa.png'
                   fit: BoxFit.contain,
                   width: double.infinity,
                   height: double.infinity,
+                  // Opcional: Manejo de error si el archivo no existe
+                  errorBuilder: (context, error, stackTrace) => const Center(
+                    child: Icon(
+                      Icons.broken_image,
+                      color: Colors.white,
+                      size: 50,
+                    ),
+                  ),
                 ),
               ),
             ),
