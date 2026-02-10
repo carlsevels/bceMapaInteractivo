@@ -41,5 +41,6 @@ flutter:
     - assets/podcast/
     - assets/logos/
     - assets/reglamentos/
+    
   uses-material-design: true
 

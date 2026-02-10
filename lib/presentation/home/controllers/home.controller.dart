@@ -418,7 +418,7 @@ class HomeController extends GetxController {
           'salaJuvenil/imagen3.jpeg',
           'salaJuvenil/imagen4.jpeg',
         ],
-        imagenReglamento: 'reglamentos/salaJuvenil.png',
+        imagenReglamento: 'assets/reglamentos/salaJuvenil.png',
         palabrasClave: [
           'juvenil',
           'jóvenes',
@@ -521,7 +521,7 @@ class HomeController extends GetxController {
           'primeraInfancia/imagen2.jpeg',
           'primeraInfancia/imagen3.jpeg',
         ],
-        imagenReglamento: "reglamentos/salaInfancias.png",
+        imagenReglamento: "assets/reglamentos/salaInfancias.png",
         palabrasClave: [
           'bebes',
           'bebés',
@@ -554,7 +554,7 @@ class HomeController extends GetxController {
           'cineInfantil/imagen3.jpeg',
           'cineInfantil/imagen4.jpeg',
         ],
-        imagenReglamento: "reglamentos/salaInfancias.png",
+        imagenReglamento: "assets/reglamentos/salaInfancias.png",
         palabrasClave: [
           'cine',
           'peliculas',
@@ -574,7 +574,7 @@ class HomeController extends GetxController {
         nombre: 'Ludoteca',
         x: 580,
         y: 960,
-        imagenReglamento: "reglamentos/salaInfancias.png",
+        imagenReglamento: "assets/reglamentos/salaInfancias.png",
         categoria: 'Infantil',
         descripcion: 'Espacio de juegos.',
         horario: [
@@ -620,7 +620,7 @@ class HomeController extends GetxController {
           'multimedia/imagen2.jpeg',
           'multimedia/imagen3.jpeg',
         ],
-        imagenReglamento: "reglamentos/multimedia.png",
+        imagenReglamento: "assets/reglamentos/multimedia.png",
         palabrasClave: [
           'computadoras',
           'computadora',
