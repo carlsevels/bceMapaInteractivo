@@ -537,7 +537,6 @@ class HomeController extends GetxController {
     return text.toLowerCase();
   }
 
-  // 🔹 MÉTODOS DE ZOOM CON LÍMITES DE CLIC
   void zoomIn() {
     if (zoomLevel.value < maxZoomClicks) {
       transformationController.value = transformationController.value.clone()
@@ -562,11 +561,4 @@ class HomeController extends GetxController {
         ? ''
         : cat;
   }
-}
-
-class _ResultadoBusqueda {
-  final Area area;
-  final int score;
-
-  _ResultadoBusqueda({required this.area, required this.score});
 }

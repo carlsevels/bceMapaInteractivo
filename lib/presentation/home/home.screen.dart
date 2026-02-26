@@ -1,6 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:mapa_interactivo/presentation/detallesArea/areaTraslations.dart';
 import 'package:mapa_interactivo/presentation/home/controllers/home.controller.dart';
 import 'package:mapa_interactivo/presentation/home/localWidgets/mapaPiso.dart';
 import 'package:mapa_interactivo/presentation/screens.dart';
@@ -628,7 +629,7 @@ Widget _buildLanguageToggleButton(bool isMini) {
                                         fontSize: 14,
                                       ),
                                       children: _buildHighlightedText(
-                                        area.nombre,
+                                        AreaTranslations.getTitle(area.nombre),
                                         controller.query.value,
                                       ),
                                     ),

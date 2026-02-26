@@ -1,6 +1,8 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:mapa_interactivo/infrastructure/models/area.dart';
+import 'package:mapa_interactivo/presentation/detallesArea/areaTraslations.dart';
 import 'package:vector_math/vector_math_64.dart' as vmath;
 
 class MapaPiso extends StatelessWidget {
@@ -33,7 +35,7 @@ class MapaPiso extends StatelessWidget {
     for (int i = 0; i < withDia.length; i++) {
       text = text.replaceAll(withDia[i], withoutDia[i]);
     }
-    return text.toLowerCase();
+    return text.toLowerCase().trim();
   }
 
   @override
@@ -52,7 +54,7 @@ class MapaPiso extends StatelessWidget {
 
         return Stack(
           children: [
-            // CAPA 1: Imagen y Marcadores (Dentro del InteractiveViewer)
+            // CAPA 1: Imagen y Marcadores
             InteractiveViewer(
               transformationController: transformationController,
               constrained: false,
@@ -64,18 +66,26 @@ class MapaPiso extends StatelessWidget {
                 children: [
                   Image.asset(image, fit: BoxFit.none),
                   ...visibleAreas.map((area) {
-                    final bool isHighlighted = currentQuery.isNotEmpty &&
-                        _removeAccents(area.nombre)
-                            .contains(_removeAccents(currentQuery));
 
-                    // Los marcadores son hijos DIRECTOS de este Stack interno
+                    final normalizedQuery = _removeAccents(currentQuery);
+
+                    final nombreES = _removeAccents(area.nombre);
+                    final nombreEN = _removeAccents(
+                      AreaTranslations.getTitle(area.nombre),
+                    );
+
+                    final bool isHighlighted =
+                        currentQuery.isNotEmpty &&
+                        (nombreES.contains(normalizedQuery) ||
+                         nombreEN.contains(normalizedQuery));
+
                     return Positioned(
                       left: area.x,
                       top: area.y,
                       child: GestureDetector(
                         onTap: () => onAreaTap(area),
                         child: _PulseMarker(
-                          nombre: area.nombre,
+                          nombre: AreaTranslations.getTitle(area.nombre),
                           isHighlighted: isHighlighted,
                           isUserLocation: area.esUbicacionActual,
                         ),
@@ -86,22 +96,32 @@ class MapaPiso extends StatelessWidget {
               ),
             ),
 
-            // CAPA 2: Indicador flotante "ESTÁS AQUÍ" corregido
+            // CAPA 2: Indicador flotante "ESTÁS AQUÍ"
             AnimatedBuilder(
               animation: transformationController,
               builder: (context, child) {
                 final userLocation = areas.firstWhere(
                   (a) => a.esUbicacionActual,
                   orElse: () => Area(
-                    nombre: '', x: -1000, y: -1000, descripcion: '',
-                    horario: [], servicios: [], reglas: [],
-                    galeria: [], categoria: '', palabrasClave: [],
+                    nombre: '',
+                    x: -1000,
+                    y: -1000,
+                    descripcion: '',
+                    horario: [],
+                    servicios: [],
+                    reglas: [],
+                    galeria: [],
+                    categoria: '',
+                    palabrasClave: [],
                   ),
                 );
 
-                if (userLocation.x == -1000) return const SizedBox.shrink();
+                if (userLocation.x == -1000) {
+                  return const SizedBox.shrink();
+                }
 
-                final vmath.Vector3 posInScreen = transformationController.value.transform3(
+                final vmath.Vector3 posInScreen =
+                    transformationController.value.transform3(
                   vmath.Vector3(userLocation.x, userLocation.y, 0),
                 );
 
@@ -114,13 +134,19 @@ class MapaPiso extends StatelessWidget {
                     posInScreen.y < limitTop ||
                     posInScreen.y > size.height - margin;
 
-                if (!isOutside) return const SizedBox.shrink();
+                if (!isOutside) {
+                  return const SizedBox.shrink();
+                }
 
-                final double arrowX = posInScreen.x.clamp(margin, limitRight);
-                final double arrowY = posInScreen.y.clamp(limitTop, size.height - margin);
-                final double angle = atan2(posInScreen.y - arrowY, posInScreen.x - arrowX);
+                final double arrowX =
+                    posInScreen.x.clamp(margin, limitRight);
+                final double arrowY =
+                    posInScreen.y.clamp(limitTop, size.height - margin);
 
-                // El Positioned debe estar AQUÍ, como retorno del builder
+                final double angle =
+                    atan2(posInScreen.y - arrowY,
+                          posInScreen.x - arrowX);
+
                 return Positioned(
                   left: arrowX - 25,
                   top: arrowY - 25,
@@ -130,18 +156,33 @@ class MapaPiso extends StatelessWidget {
                       children: [
                         Transform.rotate(
                           angle: angle + (pi / 2),
-                          child: const Icon(Icons.navigation, size: 45, color: Colors.redAccent),
+                          child: const Icon(
+                            Icons.navigation,
+                            size: 45,
+                            color: Colors.redAccent,
+                          ),
                         ),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 8, vertical: 4),
                           decoration: BoxDecoration(
                             color: Colors.redAccent,
                             borderRadius: BorderRadius.circular(8),
-                            boxShadow: const [BoxShadow(color: Colors.black26, blurRadius: 6)],
+                            boxShadow: const [
+                              BoxShadow(
+                                  color: Colors.black26,
+                                  blurRadius: 6)
+                            ],
                           ),
-                          child: const Text(
-                            "ESTÁS AQUÍ",
-                            style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
+                          child: Text(
+                            Get.locale?.languageCode == 'es'
+                                ? "ESTÁS AQUÍ"
+                                : "YOU ARE HERE",
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ),
                       ],
@@ -172,7 +213,8 @@ class _PulseMarker extends StatefulWidget {
   State<_PulseMarker> createState() => _PulseMarkerState();
 }
 
-class _PulseMarkerState extends State<_PulseMarker> with SingleTickerProviderStateMixin {
+class _PulseMarkerState extends State<_PulseMarker>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
 
   @override
@@ -204,9 +246,11 @@ class _PulseMarkerState extends State<_PulseMarker> with SingleTickerProviderSta
           children: [
             if (widget.isHighlighted || widget.isUserLocation)
               FadeTransition(
-                opacity: Tween(begin: 0.6, end: 0.0).animate(_controller),
+                opacity:
+                    Tween(begin: 0.6, end: 0.0).animate(_controller),
                 child: ScaleTransition(
-                  scale: Tween(begin: 1.0, end: 3.0).animate(_controller),
+                  scale:
+                      Tween(begin: 1.0, end: 3.0).animate(_controller),
                   child: Container(
                     width: 30,
                     height: 30,
@@ -232,22 +276,32 @@ class _PulseMarkerState extends State<_PulseMarker> with SingleTickerProviderSta
               ),
               padding: const EdgeInsets.all(5),
               child: Icon(
-                widget.isUserLocation ? Icons.person_pin : Icons.location_on,
+                widget.isUserLocation
+                    ? Icons.person_pin
+                    : Icons.location_on,
                 color: Colors.white,
-                size: (widget.isHighlighted || widget.isUserLocation) ? 24 : 18,
+                size: (widget.isHighlighted ||
+                        widget.isUserLocation)
+                    ? 24
+                    : 18,
               ),
             ),
           ],
         ),
         const SizedBox(height: 5),
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          padding: const EdgeInsets.symmetric(
+              horizontal: 8, vertical: 4),
           decoration: BoxDecoration(
             color: widget.isUserLocation
                 ? Colors.redAccent
-                : (widget.isHighlighted ? Colors.orange : Colors.black87),
+                : (widget.isHighlighted
+                    ? Colors.orange
+                    : Colors.black87),
             borderRadius: BorderRadius.circular(10),
-            boxShadow: const [BoxShadow(color: Colors.black12, blurRadius: 4)],
+            boxShadow: const [
+              BoxShadow(color: Colors.black12, blurRadius: 4)
+            ],
           ),
           child: Text(
             widget.nombre.toUpperCase(),
