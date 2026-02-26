@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:mapa_interactivo/presentation/home/controllers/home.controller.dart';
 import 'package:mapa_interactivo/presentation/home/localWidgets/mapaPiso.dart';
 import 'package:mapa_interactivo/presentation/screens.dart';
+import 'package:mapa_interactivo/l10n/app_localizations.dart';
 
 class HomeScreen extends GetView<HomeController> {
   HomeScreen({Key? key}) : super(key: key) {
@@ -180,7 +181,6 @@ class HomeScreen extends GetView<HomeController> {
 
       // --- LÓGICA PARA MÓVIL (BARRA INFERIOR) ---
       if (isMobile) {
-        // Forzamos el ancho a 0 para que no estorbe al mapa
         if (currentWidth != 0) {
           Future.microtask(() => controller.menuWidth.value = 0);
         }
@@ -208,6 +208,17 @@ class HomeScreen extends GetView<HomeController> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
+                    // --- BOTÓN IDIOMA MÓVIL ---
+                    TextButton(
+                      onPressed: () => _toggleLanguage(),
+                      child: Text(
+                        Get.locale?.languageCode == 'en' ? "ES" : "EN",
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
                     // Ayuda
                     IconButton(
                       icon: const Icon(
@@ -226,10 +237,9 @@ class HomeScreen extends GetView<HomeController> {
                           color: Colors.white,
                           size: 26,
                         ),
-                        onPressed: () => _showSearchDialog(),
+                        onPressed: () => _showSearchDialog(context),
                       ),
                     ),
-                    // Separador visual opcional o espacio
                     const SizedBox(width: 10),
                     // Selector de Pisos
                     _tutorialHighlight(
@@ -304,7 +314,7 @@ class HomeScreen extends GetView<HomeController> {
                   child: isMini
                       ? _buildMiniCircleButton(
                           Icons.search,
-                          () => _showSearchDialog(),
+                          () => _showSearchDialog(context),
                         )
                       : _buildSearchSection(),
                 ),
@@ -312,13 +322,18 @@ class HomeScreen extends GetView<HomeController> {
                 // Lista de Pisos
                 Expanded(child: _buildFloorList(isMini)),
                 const SizedBox(height: 20),
+
+                // --- BOTÓN IDIOMA DESKTOP ---
+                _buildLanguageToggleButton(isMini),
+
+                const SizedBox(height: 15),
                 // Ayuda
                 _buildMiniCircleButton(
                   Icons.help_outline,
                   () => controller.iniciarTutorial(),
                 ),
                 const SizedBox(height: 15),
-                // Flecha para cerrar (Abajo)
+                // Flecha para cerrar
                 if (!isClosed)
                   Center(
                     child: IconButton(
@@ -336,6 +351,70 @@ class HomeScreen extends GetView<HomeController> {
         ),
       );
     });
+  }
+
+  // --- FUNCIONES DE APOYO PARA EL CAMBIO DE IDIOMA ---
+
+  void _toggleLanguage() {
+    if (Get.locale?.languageCode == 'en') {
+      Get.updateLocale(const Locale('es'));
+    } else {
+      Get.updateLocale(const Locale('en'));
+    }
+  }
+
+  Widget _buildLanguageToggleButton(bool isMini) {
+    String label = Get.locale?.languageCode == 'en' ? "ES" : "EN";
+
+    if (isMini) {
+      return _buildMiniCircleButton(
+        Icons.language,
+        () => _toggleLanguage(),
+        label:
+            label, // Si tu función _buildMiniCircleButton soporta un label pequeño
+      );
+    }
+
+    return TextButton.icon(
+      icon: const Icon(Icons.language, color: Colors.white),
+      label: Text(
+        "Cambiar a $label",
+        style: const TextStyle(color: Colors.white),
+      ),
+      onPressed: () => _toggleLanguage(),
+    );
+  }
+
+  // Ajuste rápido por si tu función no recibe label
+  Widget _buildMiniCircleButton(
+    IconData icon,
+    VoidCallback onTap, {
+    String? label,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      child: Column(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.2),
+              shape: BoxShape.circle,
+            ),
+            child: label != null
+                ? Text(
+                    label,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 12,
+                    ),
+                  )
+                : Icon(icon, color: Colors.white, size: 20),
+          ),
+        ],
+      ),
+    );
   }
 
   Widget _buildMobileFloorButton(String label, int floorValue) {
@@ -363,23 +442,8 @@ class HomeScreen extends GetView<HomeController> {
     });
   }
 
-  Widget _buildMiniCircleButton(IconData icon, VoidCallback onTap) {
-    return InkWell(
-      onTap: onTap,
-      child: Container(
-        width: 45,
-        height: 45,
-        decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.15),
-          shape: BoxShape.circle,
-        ),
-        child: Icon(icon, color: Colors.white, size: 20),
-      ),
-    );
-  }
-
   // DIÁLOGO PARA BÚSQUEDA CENTRAL
-  void _showSearchDialog() {
+  void _showSearchDialog(context) {
     Get.dialog(
       Center(
         child: Material(
@@ -397,8 +461,8 @@ class HomeScreen extends GetView<HomeController> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Text(
-                  "Buscador",
+                Text(
+                  AppLocalizations.of(context)!.searcher,
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 18,
@@ -764,38 +828,57 @@ class HomeScreen extends GetView<HomeController> {
     );
   }
 
-  Widget _buildFloatingFloorIndicator(bool isMobile) => Positioned(
-    top: 20, // Ajusta esta altura a tu gusto
-    left: 20,
+Widget _buildFloatingFloorIndicator(bool isMobile) => Positioned(
+    top: 10, // Un poco más de aire desde el borde superior
+    left: 15, // En Desktop le damos espacio para que no choque con el menú lateral
     right: 20,
     child: Row(
-      mainAxisAlignment: isMobile
-          ? MainAxisAlignment.spaceBetween
+      // En móvil se separan (logo a la izquierda, piso a la derecha)
+      // En desktop, el piso se queda a la izquierda con el margen que le dimos
+      mainAxisAlignment: isMobile 
+          ? MainAxisAlignment.spaceBetween 
           : MainAxisAlignment.start,
       children: [
         if (isMobile)
-          SizedBox(width: 50, child: Image.asset("logos/bce2.png"))
-        else
-          const SizedBox.shrink(),
+          // Agregamos un padding al logo para que no pegue con el notch/borde
+          Padding(
+            padding: const EdgeInsets.only(left: 5),
+            child: Image.asset(
+              "assets/logos/bce2.png", // Asegúrate del prefijo assets/
+              width: 50,
+              height: 50,
+              fit: BoxFit.contain,
+            ),
+          ),
 
+        // El indicador de piso con diseño Glassmorphism
         ClipRRect(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(20), // Un poco más redondeado se ve más moderno
           child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
+            filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12), // Más blur para suavizar el fondo
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.85),
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: Colors.white.withOpacity(0.2)),
+                color: Colors.white.withOpacity(0.8),
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(color: Colors.white.withOpacity(0.3)),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.05),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  )
+                ],
               ),
               child: Obx(
                 () => Text(
-                  "PISO ${controller.pisoActual.value}",
+                  // Usamos la traducción para "PISO"
+                  "Piso ${controller.pisoActual.value}",
                   style: TextStyle(
                     fontWeight: FontWeight.w900,
                     color: Colors.cyan[900],
-                    letterSpacing: 1,
+                    fontSize: 14,
+                    letterSpacing: 1.5, // Más espacio entre letras para legibilidad
                   ),
                 ),
               ),
@@ -805,6 +888,7 @@ class HomeScreen extends GetView<HomeController> {
       ],
     ),
   );
+ 
   Widget _buildFloatingMenuButton() {
     return Positioned(
       bottom: 30,

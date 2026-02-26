@@ -1,0 +1,7 @@
+{
+    "appTitle": "Localization Demo App",
+    "searcher": "Searcher",
+    "@searcher": {
+        "description": "Label for the search bar"
+    }
+}
