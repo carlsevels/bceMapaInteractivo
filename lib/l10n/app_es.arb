@@ -1,4 +1,5 @@
 {
-    "appTitle": "App de demostración",
-    "searcher": "Buscador"
+    "searcher": "Buscador",
+    "floor": "Piso",
+    "searchPlaceholder": "¿Qué buscas hoy?"
 }

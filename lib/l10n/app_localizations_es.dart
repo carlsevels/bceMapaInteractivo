@@ -9,8 +9,11 @@ class AppLocalizationsEs extends AppLocalizations {
   AppLocalizationsEs([String locale = 'es']) : super(locale);
 
   @override
-  String get appTitle => 'App de demostración';
+  String get searcher => 'Buscador';
 
   @override
-  String get searcher => 'Buscador';
+  String get searchPlaceholder => '¿Qué buscas hoy?';
+
+  @override
+  String get floor => 'Piso';
 }

@@ -1,7 +1,11 @@
 {
-    "appTitle": "Localization Demo App",
     "searcher": "Searcher",
     "@searcher": {
         "description": "Label for the search bar"
+    },
+    "searchPlaceholder": "How can we help?",
+    "floor": "Floor",
+    "@floor": {
+        "description": "Label for the building level, e.g., Floor 1"
     }
 }

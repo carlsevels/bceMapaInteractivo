@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:mapa_interactivo/infrastructure/globalViews/tituloSection.dart';
 import 'package:mapa_interactivo/infrastructure/models/area.dart';
+import 'package:mapa_interactivo/l10n/app_localizations.dart';
 import 'package:mapa_interactivo/presentation/detallesArea/localWidgets/bannerSeparar.dart';
 import 'package:mapa_interactivo/presentation/detallesArea/localWidgets/galeria.dart';
 import 'package:mapa_interactivo/presentation/detallesArea/localWidgets/headerDetalles.dart';
@@ -24,90 +25,263 @@ class DetallesAreaScreen extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: const Color(0xFFF8F9FA),
-      body: Stack(
-        children: [
-          CustomScrollView(
-            physics: const BouncingScrollPhysics(),
-            slivers: [
-              headerDetalles(areaFinal),
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16.0,
-                    vertical: 20,
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _buildQuickStats(areaFinal),
-                      const SizedBox(height: 28),
-                      tituloSection("Acerca del espacio"),
-                      const SizedBox(height: 12),
-                      Text(
-                        areaFinal.descripcion,
-                        style: TextStyle(
-                          fontSize: 15,
-                          color: Colors.grey.shade800,
-                          height: 1.6,
-                        ),
-                      ),
-                      if (areaFinal.galeria.isNotEmpty)
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const SizedBox(height: 28),
-                            tituloSection("Galería visual"),
-                            const SizedBox(height: 12),
-                            galeria(areaFinal.galeria, areaFinal.nombre),
-                          ],
-                        ),
-                      const SizedBox(height: 28),
+      // Envolvemos el cuerpo en Obx para que reaccione al cambio de idioma global
+      body: Obx(() {
+        // Detectamos el idioma actual para etiquetas estáticas
+        final String lang = Get.locale?.languageCode ?? 'es';
 
-                      // Modificado para incluir la lógica de la imagen de reglamento
-                      _buildCompactInfoRow(context, areaFinal),
+        return Stack(
+          children: [
+            CustomScrollView(
+              physics: const BouncingScrollPhysics(),
+              slivers: [
+                headerDetalles(areaFinal),
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16.0,
+                      vertical: 20,
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _buildQuickStats(areaFinal, context, lang),
+                        const SizedBox(height: 28),
 
-                      if (areaFinal.sePuedeRentar == true) ...[
-                        const SizedBox(height: 32),
-                        bannerSeparar(areaFinal),
+                        // Título traducido
+                        tituloSection(
+                          lang == 'es'
+                              ? "Acerca del espacio"
+                              : "About this space",
+                        ),
+                        const SizedBox(height: 12),
+
+                        // Descripción traducida mediante el getter del modelo Area
+                        Text(
+                          areaFinal.displayDescription,
+                          style: TextStyle(
+                            fontSize: 15,
+                            color: Colors.grey.shade800,
+                            height: 1.6,
+                          ),
+                        ),
+
+                        if (areaFinal.galeria.isNotEmpty)
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const SizedBox(height: 28),
+                              tituloSection(
+                                lang == 'es'
+                                    ? "Galería visual"
+                                    : "Visual Gallery",
+                              ),
+                              const SizedBox(height: 12),
+                              galeria(areaFinal.galeria, areaFinal.displayName),
+                            ],
+                          ),
+                        const SizedBox(height: 28),
+
+                        _buildCompactInfoRow(context, areaFinal, lang),
+
+                        if (areaFinal.sePuedeRentar == true) ...[
+                          const SizedBox(height: 32),
+                          bannerSeparar(areaFinal),
+                        ],
+                        const SizedBox(height: 80),
                       ],
-                      const SizedBox(height: 80),
-                    ],
+                    ),
                   ),
                 ),
-              ),
-            ],
-          ),
-          Positioned(
-            top: 12,
-            right: 12,
-            child: SafeArea(
-              child: FloatingActionButton.small(
-                onPressed: isMobile ? Get.back : controller.closePanel,
-                backgroundColor: Colors.white.withOpacity(0.9),
-                elevation: 4,
-                child: const Icon(Icons.close, color: Colors.black87),
+              ],
+            ),
+
+            // Botón de cerrar
+            Positioned(
+              top: 12,
+              right: 12,
+              child: SafeArea(
+                child: FloatingActionButton.small(
+                  onPressed: isMobile ? Get.back : controller.closePanel,
+                  backgroundColor: Colors.white.withOpacity(0.9),
+                  elevation: 4,
+                  child: const Icon(Icons.close, color: Colors.black87),
+                ),
               ),
             ),
+          ],
+        );
+      }),
+    );
+  }
+
+  Widget _buildQuickStats(Area area, BuildContext context, String lang) {
+    return Column(
+      children: [
+        _miniStat(
+          Icons.access_time_filled_rounded,
+          area.horario.isNotEmpty
+              ? area.horario
+              : [
+                  lang == 'es'
+                      ? "Horario no disponible"
+                      : "Hours not available",
+                ],
+          colorNaranja,
+        ),
+        const SizedBox(height: 8),
+        _miniStat(Icons.location_on_rounded, [
+          lang == 'es' ? "Ubicación" : "Location",
+          "${AppLocalizations.of(context)!.floor} ${controller.pisoActual.value}",
+        ], colorAccent),
+      ],
+    );
+  }
+
+  Widget _buildCompactInfoRow(BuildContext context, Area area, String lang) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: Colors.grey.shade100),
+      ),
+      child: Column(
+        children: [
+          _buildSimpleListTile(
+            lang == 'es' ? "Servicios" : "Services",
+            area.servicios,
+            Icons.bolt_rounded,
+            colorAccent,
           ),
+          const Padding(
+            padding: EdgeInsets.symmetric(vertical: 12),
+            child: Divider(height: 1),
+          ),
+          if (area.reglas != null)
+            _buildSimpleListTile(
+              lang == 'es' ? "Reglas del espacio" : "Space Rules",
+              area.reglas ?? [],
+              Icons.gavel_rounded,
+              Colors.redAccent,
+            ),
+
+          if (area.imagenReglamento != null &&
+              area.imagenReglamento!.isNotEmpty) ...[
+            const SizedBox(height: 20),
+            GestureDetector(
+              onTap: () =>
+                  _showFullScreenImage(context, area.imagenReglamento!, lang),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    lang == 'es'
+                        ? "Reglamento oficial:"
+                        : "Official Regulations:",
+                    style: const TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.grey,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Stack(
+                    alignment: Alignment.bottomRight,
+                    children: [
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(12),
+                        child: Container(
+                          width: double.infinity,
+                          decoration: BoxDecoration(
+                            color: Colors.grey.shade50,
+                            border: Border.all(color: Colors.grey.shade200),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Image.asset(
+                            area.imagenReglamento!,
+                            fit: BoxFit.contain,
+                            errorBuilder: (context, error, stackTrace) =>
+                                const SizedBox(
+                                  height: 100,
+                                  child: Center(
+                                    child: Icon(
+                                      Icons.broken_image,
+                                      color: Colors.grey,
+                                    ),
+                                  ),
+                                ),
+                          ),
+                        ),
+                      ),
+                      Container(
+                        margin: const EdgeInsets.all(10),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 6,
+                        ),
+                        decoration: BoxDecoration(
+                          color: colorAccent.withOpacity(0.9),
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(
+                              Icons.zoom_in_rounded,
+                              color: Colors.white,
+                              size: 16,
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              lang == 'es' ? "Expandir" : "Expand",
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 11,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
         ],
       ),
     );
   }
 
-  Widget _buildQuickStats(Area area) {
-    return Column(
-      children: [
-        _miniStat(
-          Icons.access_time_filled_rounded,
-          area.horario.isNotEmpty ? area.horario : ["Horario no disponible"],
-          colorNaranja,
+  void _showFullScreenImage(
+    BuildContext context,
+    String imageUrl,
+    String lang,
+  ) {
+    showDialog(
+      context: context,
+      builder: (context) => Dialog(
+        backgroundColor: Colors.black.withOpacity(0.9),
+        insetPadding: EdgeInsets.zero,
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            InteractiveViewer(
+              child: Image.asset(imageUrl, fit: BoxFit.contain),
+            ),
+            Positioned(
+              top: 40,
+              right: 20,
+              child: IconButton(
+                icon: const Icon(Icons.close, color: Colors.white, size: 30),
+                onPressed: () => Navigator.pop(context),
+              ),
+            ),
+          ],
         ),
-        const SizedBox(height: 8),
-        _miniStat(Icons.location_on_rounded, [
-          "Ubicación",
-          "Piso ${controller.pisoActual}",
-        ], colorAccent),
-      ],
+      ),
     );
   }
 
@@ -183,179 +357,8 @@ class DetallesAreaScreen extends StatelessWidget {
                         ],
                       ),
                     ),
-                    Icon(
-                      Icons.arrow_forward_ios_rounded,
-                      size: 12,
-                      color: Colors.grey.withOpacity(0.2),
-                    ),
                   ],
                 ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  // ... (resto del código igual arriba)
-
-  Widget _buildCompactInfoRow(BuildContext context, Area area) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.grey.shade100),
-      ),
-      child: Column(
-        children: [
-          _buildSimpleListTile(
-            "Servicios",
-            area.servicios,
-            Icons.bolt_rounded,
-            colorAccent,
-          ),
-          const Padding(
-            padding: EdgeInsets.symmetric(vertical: 12),
-            child: Divider(height: 1),
-          ),
-          if (area.reglas != null)
-            _buildSimpleListTile(
-              "Reglas del espacio",
-              area.reglas ?? [],
-              Icons.gavel_rounded,
-              Colors.redAccent,
-            ),
-
-          // 🔹 Sección de Imagen del Reglamento Corregida
-          if (area.imagenReglamento != null &&
-              area.imagenReglamento!.isNotEmpty) ...[
-            const SizedBox(height: 20),
-            GestureDetector(
-              onTap: () =>
-                  _showFullScreenImage(context, area.imagenReglamento!),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    "Reglamento oficial:",
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.grey,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Stack(
-                    alignment: Alignment.bottomRight,
-                    children: [
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(12),
-                        child: Container(
-                          width: double.infinity,
-                          decoration: BoxDecoration(
-                            color: Colors.grey.shade50,
-                            border: Border.all(color: Colors.grey.shade200),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Image.asset(
-                            area.imagenReglamento!, // La ruta debe ser algo como 'assets/images/regla.png'
-                            fit: BoxFit.contain,
-                            errorBuilder: (context, error, stackTrace) =>
-                                Container(
-                                  height: 100,
-                                  child: const Center(
-                                    child: Icon(
-                                      Icons.broken_image,
-                                      color: Colors.grey,
-                                    ),
-                                  ),
-                                ),
-                          ),
-                        ),
-                      ),
-                      // Badge decorativo
-                      Container(
-                        margin: const EdgeInsets.all(10),
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 10,
-                          vertical: 6,
-                        ),
-                        decoration: BoxDecoration(
-                          color: colorAccent.withOpacity(0.9),
-                          borderRadius: BorderRadius.circular(30),
-                        ),
-                        child: const Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(
-                              Icons.zoom_in_rounded,
-                              color: Colors.white,
-                              size: 16,
-                            ),
-                            SizedBox(width: 4),
-                            Text(
-                              "Expandir",
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 11,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ],
-      ),
-    );
-  }
-
-  // ... (El resto del método _showFullScreenImage y _buildSimpleListTile se mantienen igual)
-  void _showFullScreenImage(BuildContext context, String imageUrl) {
-    showDialog(
-      context: context,
-      builder: (context) => Dialog(
-        backgroundColor: Colors.transparent,
-        insetPadding: EdgeInsets.zero,
-        child: Stack(
-          alignment: Alignment.center,
-          children: [
-            GestureDetector(
-              onTap: () => Navigator.pop(context),
-              child: InteractiveViewer(
-                panEnabled: true,
-                minScale: 0.5,
-                maxScale: 4.0,
-                // CAMBIO: Se usa Image.asset para archivos locales
-                child: Image.asset(
-                  imageUrl, // Asegúrate de que esta variable sea la ruta, ej: 'assets/mapa.png'
-                  fit: BoxFit.contain,
-                  width: double.infinity,
-                  height: double.infinity,
-                  // Opcional: Manejo de error si el archivo no existe
-                  errorBuilder: (context, error, stackTrace) => const Center(
-                    child: Icon(
-                      Icons.broken_image,
-                      color: Colors.white,
-                      size: 50,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            Positioned(
-              top: 40,
-              right: 20,
-              child: IconButton(
-                icon: const Icon(Icons.close, color: Colors.white, size: 30),
-                onPressed: () => Navigator.pop(context),
               ),
             ),
           ],
@@ -395,39 +398,33 @@ class DetallesAreaScreen extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 10),
-        if (items.isEmpty)
-          const Text(
-            "No especificado",
-            style: TextStyle(fontSize: 13, color: Colors.grey),
-          )
-        else
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: items
-                .map(
-                  (e) => Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 10,
-                      vertical: 4,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Colors.grey.shade50,
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: Colors.grey.shade200),
-                    ),
-                    child: Text(
-                      e,
-                      style: const TextStyle(
-                        fontSize: 12,
-                        color: Colors.blueGrey,
-                        fontWeight: FontWeight.w500,
-                      ),
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: items
+              .map(
+                (e) => Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 4,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade50,
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: Colors.grey.shade200),
+                  ),
+                  child: Text(
+                    e,
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: Colors.blueGrey,
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
-                )
-                .toList(),
-          ),
+                ),
+              )
+              .toList(),
+        ),
       ],
     );
   }

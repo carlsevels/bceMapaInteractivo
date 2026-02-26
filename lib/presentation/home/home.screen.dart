@@ -44,7 +44,7 @@ class HomeScreen extends GetView<HomeController> {
                       paddingTop: 150,
                     ),
                     _buildCategoryFilterBar(isMobile),
-                    _buildFloatingFloorIndicator(isMobile),
+                    _buildFloatingFloorIndicator(isMobile, context),
                     _buildFloatingMenuButton(),
                   ],
                 ),
@@ -316,11 +316,11 @@ class HomeScreen extends GetView<HomeController> {
                           Icons.search,
                           () => _showSearchDialog(context),
                         )
-                      : _buildSearchSection(),
+                      : _buildSearchSection(context),
                 ),
                 const SizedBox(height: 25),
                 // Lista de Pisos
-                Expanded(child: _buildFloorList(isMini)),
+                Expanded(child: _buildFloorList(isMini, context)),
                 const SizedBox(height: 20),
 
                 // --- BOTÓN IDIOMA DESKTOP ---
@@ -363,29 +363,31 @@ class HomeScreen extends GetView<HomeController> {
     }
   }
 
-  Widget _buildLanguageToggleButton(bool isMini) {
-    String label = Get.locale?.languageCode == 'en' ? "ES" : "EN";
+Widget _buildLanguageToggleButton(bool isMini) {
+  return GetBuilder<HomeController>( 
+    builder: (controller) {
+      String currentLang = Get.locale?.languageCode ?? 'es';
+      String label = currentLang == 'en' ? "ES" : "EN";
 
-    if (isMini) {
-      return _buildMiniCircleButton(
-        Icons.language,
-        () => _toggleLanguage(),
-        label:
-            label, // Si tu función _buildMiniCircleButton soporta un label pequeño
+      if (isMini) {
+        return _buildMiniCircleButton(
+          Icons.language,
+          () => _toggleLanguage(),
+          label: label,
+        );
+      }
+
+      return TextButton.icon(
+        icon: const Icon(Icons.language, color: Colors.white),
+        label: Text(
+          "Cambiar a $label",
+          style: const TextStyle(color: Colors.white),
+        ),
+        onPressed: () => _toggleLanguage(),
       );
-    }
-
-    return TextButton.icon(
-      icon: const Icon(Icons.language, color: Colors.white),
-      label: Text(
-        "Cambiar a $label",
-        style: const TextStyle(color: Colors.white),
-      ),
-      onPressed: () => _toggleLanguage(),
-    );
-  }
-
-  // Ajuste rápido por si tu función no recibe label
+    },
+  );
+}
   Widget _buildMiniCircleButton(
     IconData icon,
     VoidCallback onTap, {
@@ -470,7 +472,7 @@ class HomeScreen extends GetView<HomeController> {
                   ),
                 ),
                 const SizedBox(height: 20),
-                _buildSearchSection(),
+                _buildSearchSection(context),
                 const SizedBox(height: 10),
                 TextButton(
                   onPressed: () => Get.back(),
@@ -488,7 +490,7 @@ class HomeScreen extends GetView<HomeController> {
   }
 
   // --- MODIFICADO PARA SOPORTAR P1 / PISO 1 ---
-  Widget _buildFloorList(bool isMini) {
+  Widget _buildFloorList(bool isMini, context) {
     return ListView(
       padding: EdgeInsets.zero,
       children: [2, 1].map((i) {
@@ -530,7 +532,9 @@ class HomeScreen extends GetView<HomeController> {
                       ),
                       if (!isMini) const SizedBox(width: 15),
                       Text(
-                        isMini ? "P$i" : "PISO $i",
+                        isMini
+                            ? "P$i"
+                            : "${AppLocalizations.of(context)!.floor} $i",
                         style: TextStyle(
                           color: sel ? Colors.orange : Colors.white,
                           fontWeight: FontWeight.w900,
@@ -575,7 +579,7 @@ class HomeScreen extends GetView<HomeController> {
   final LayerLink searchLayerLink = LayerLink();
   final OverlayPortalController overlayController = OverlayPortalController();
 
-  Widget _buildSearchSection() {
+  Widget _buildSearchSection(context) {
     return CompositedTransformTarget(
       link: searchLayerLink,
       child: OverlayPortal(
@@ -655,7 +659,7 @@ class HomeScreen extends GetView<HomeController> {
           },
           style: const TextStyle(color: Colors.white),
           decoration: InputDecoration(
-            hintText: "¿Qué buscas hoy?",
+            hintText: AppLocalizations.of(context)!.searchPlaceholder,
             hintStyle: TextStyle(color: Colors.white.withOpacity(0.6)),
             prefixIcon: const Icon(Icons.search, color: Colors.white70),
             filled: true,
@@ -828,34 +832,30 @@ class HomeScreen extends GetView<HomeController> {
     );
   }
 
-Widget _buildFloatingFloorIndicator(bool isMobile) => Positioned(
-    top: 10, // Un poco más de aire desde el borde superior
-    left: 15, // En Desktop le damos espacio para que no choque con el menú lateral
+  Widget _buildFloatingFloorIndicator(bool isMobile, context) => Positioned(
+    top: 10,
+    left: 15,
     right: 20,
     child: Row(
-      // En móvil se separan (logo a la izquierda, piso a la derecha)
-      // En desktop, el piso se queda a la izquierda con el margen que le dimos
-      mainAxisAlignment: isMobile 
-          ? MainAxisAlignment.spaceBetween 
+      mainAxisAlignment: isMobile
+          ? MainAxisAlignment.spaceBetween
           : MainAxisAlignment.start,
       children: [
         if (isMobile)
-          // Agregamos un padding al logo para que no pegue con el notch/borde
           Padding(
             padding: const EdgeInsets.only(left: 5),
             child: Image.asset(
-              "assets/logos/bce2.png", // Asegúrate del prefijo assets/
+              "assets/logos/bce2.png",
               width: 50,
               height: 50,
               fit: BoxFit.contain,
             ),
           ),
 
-        // El indicador de piso con diseño Glassmorphism
         ClipRRect(
-          borderRadius: BorderRadius.circular(20), // Un poco más redondeado se ve más moderno
+          borderRadius: BorderRadius.circular(20),
           child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12), // Más blur para suavizar el fondo
+            filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
               decoration: BoxDecoration(
@@ -867,18 +867,17 @@ Widget _buildFloatingFloorIndicator(bool isMobile) => Positioned(
                     color: Colors.black.withOpacity(0.05),
                     blurRadius: 10,
                     offset: const Offset(0, 4),
-                  )
+                  ),
                 ],
               ),
               child: Obx(
                 () => Text(
-                  // Usamos la traducción para "PISO"
-                  "Piso ${controller.pisoActual.value}",
+                  "${AppLocalizations.of(context)!.floor} ${controller.pisoActual.value}",
                   style: TextStyle(
                     fontWeight: FontWeight.w900,
                     color: Colors.cyan[900],
                     fontSize: 14,
-                    letterSpacing: 1.5, // Más espacio entre letras para legibilidad
+                    letterSpacing: 1.5,
                   ),
                 ),
               ),
@@ -888,7 +887,7 @@ Widget _buildFloatingFloorIndicator(bool isMobile) => Positioned(
       ],
     ),
   );
- 
+
   Widget _buildFloatingMenuButton() {
     return Positioned(
       bottom: 30,

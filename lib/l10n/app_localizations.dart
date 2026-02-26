@@ -98,17 +98,23 @@ abstract class AppLocalizations {
     Locale('es'),
   ];
 
-  /// No description provided for @appTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Localization Demo App'**
-  String get appTitle;
-
   /// Label for the search bar
   ///
   /// In en, this message translates to:
   /// **'Searcher'**
   String get searcher;
+
+  /// No description provided for @searchPlaceholder.
+  ///
+  /// In en, this message translates to:
+  /// **'How can we help?'**
+  String get searchPlaceholder;
+
+  /// Label for the building level, e.g., Floor 1
+  ///
+  /// In en, this message translates to:
+  /// **'Floor'**
+  String get floor;
 }
 
 class _AppLocalizationsDelegate
